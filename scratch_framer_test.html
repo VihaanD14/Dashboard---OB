@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RetainlyAI Framer Motion Test</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    background-color: #030712;
+    color: #F8FAFC;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    overflow-x: hidden;
+    min-height: 200vh;
+  }
+
+  /* Celestial Horizon Glow */
+  .cosmic-glow {
+    position: absolute;
+    top: -150px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 900px;
+    height: 450px;
+    background: radial-gradient(ellipse at 50% 30%, rgba(56, 189, 248, 0.22) 0%, rgba(14, 165, 233, 0.06) 45%, rgba(3, 7, 18, 0) 72%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .framer-sticky-container {
+    position: relative;
+    width: 100%;
+    height: 900px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  /* Center Key Content */
+  .center-content {
+    position: relative;
+    z-index: 5;
+    max-width: 720px;
+    text-align: center;
+    padding: 2rem 1.5rem;
+    pointer-events: auto;
+    transition: transform 0.1s ease-out, opacity 0.1s ease-out;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(56, 189, 248, 0.08);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    border-radius: 9999px;
+    padding: 0.35rem 1.15rem;
+    color: #38BDF8;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 1.25rem;
+    box-shadow: 0 0 16px rgba(56, 189, 248, 0.15);
+  }
+
+  .hero-title {
+    font-size: 3.4rem;
+    font-weight: 800;
+    line-height: 1.12;
+    letter-spacing: -0.03em;
+    color: #F8FAFC;
+    margin-bottom: 1.25rem;
+  }
+
+  .hero-title span {
+    background: linear-gradient(135deg, #38BDF8 0%, #818CF8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .hero-quote-box {
+    background: rgba(11, 15, 25, 0.82);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(56, 189, 248, 0.24);
+    border-radius: 16px;
+    padding: 1.25rem 1.75rem;
+    margin: 0 auto 2rem auto;
+    max-width: 650px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 20px rgba(56, 189, 248, 0.15);
+  }
+
+  .hero-quote-text {
+    font-size: 1.12rem;
+    color: #E2E8F0;
+    line-height: 1.6;
+    font-weight: 400;
+  }
+
+  .hero-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.25rem;
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #FFFFFF;
+    color: #030712;
+    font-weight: 700;
+    font-size: 0.95rem;
+    padding: 0.8rem 1.85rem;
+    border-radius: 9999px;
+    text-decoration: none;
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.35), 0 0 30px rgba(56, 189, 248, 0.4);
+    transition: all 0.2s ease;
+  }
+  .btn-primary:hover {
+    background: #E0F2FE;
+    transform: translateY(-2px);
+    box-shadow: 0 0 35px rgba(56, 189, 248, 0.6);
+  }
+
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(11, 15, 25, 0.75);
+    color: #F8FAFC;
+    font-weight: 500;
+    font-size: 0.95rem;
+    padding: 0.78rem 1.6rem;
+    border-radius: 9999px;
+    border: 1px solid rgba(56, 189, 248, 0.28);
+    text-decoration: none;
+    backdrop-filter: blur(12px);
+    transition: all 0.2s ease;
+  }
+  .btn-secondary:hover {
+    border-color: rgba(56, 189, 248, 0.6);
+    background: rgba(15, 23, 42, 0.95);
+    transform: translateY(-2px);
+  }
+
+  /* WhatsApp Message Cards Layer */
+  .cards-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  .wa-bubble {
+    position: absolute;
+    width: 290px;
+    background: #FFFFFF;
+    color: #111827;
+    border-radius: 14px;
+    padding: 0.9rem 1.1rem 1.1rem 1.1rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(0, 0, 0, 0.15);
+    pointer-events: auto;
+    cursor: default;
+    transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.18s ease;
+    will-change: transform;
+  }
+
+  .wa-bubble:hover {
+    transform: scale(1.04) translateY(-3px) !important;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 18px rgba(56, 189, 248, 0.45) !important;
+    z-index: 50;
+  }
+
+  /* Tail */
+  .wa-bubble::before {
+    content: '';
+    position: absolute;
+    top: 12px;
+    left: -7px;
+    width: 0;
+    height: 0;
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+    border-right: 8px solid #FFFFFF;
+  }
+
+  .wa-sender {
+    font-size: 0.8rem;
+    font-weight: 700;
+    margin-bottom: 0.35rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .wa-sender-tag {
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 0.15rem 0.45rem;
+    border-radius: 9999px;
+    text-transform: uppercase;
+  }
+
+  .wa-text {
+    font-size: 0.84rem;
+    line-height: 1.45;
+    color: #1F2937;
+    margin-bottom: 0.45rem;
+  }
+
+  .wa-meta {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.68rem;
+    color: #6B7280;
+  }
+
+  .wa-check {
+    color: #38BDF8;
+    font-weight: 700;
+  }
+
+  /* Reactions Pill */
+  .wa-reactions {
+    position: absolute;
+    bottom: -11px;
+    left: 14px;
+    background: #FFFFFF;
+    border: 1px solid #E5E7EB;
+    border-radius: 9999px;
+    padding: 0.15rem 0.55rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #374151;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  /* Green resolution card (WhatsApp received bubble) */
+  .wa-bubble-resolution {
+    background: #DCF8C6; /* Classic WhatsApp received green */
+  }
+  .wa-bubble-resolution::before {
+    border-right-color: #DCF8C6;
+  }
+  .wa-bubble-resolution .wa-reactions {
+    background: #F0FDF4;
+    border-color: #BBF7D0;
+  }
+</style>
+</head>
+<body>
+
+<div class="cosmic-glow"></div>
+
+<div class="framer-sticky-container" id="framerHero">
+  <!-- Center Key RetainlyAI Content -->
+  <div class="center-content" id="centerContent">
+    <div class="hero-badge">
+      <span>✦</span> PREDICTIVE TALENT INTELLIGENCE
+    </div>
+    <div class="hero-title">
+      Stop Losing Key Talent <br><span>Before They Leave.</span>
+    </div>
+    
+    <div class="hero-quote-box">
+      <p class="hero-quote-text">
+        &ldquo;RetainlyAI decodes silent exit signals and turns team sentiment into high-ROI retention playbooks &mdash; before resignation letters hit your desk.&rdquo;
+      </p>
+    </div>
+
+    <div class="hero-actions">
+      <a href="/Enterprise_Dashboard" target="_self" class="btn-primary">
+        Launch Enterprise Portal &rarr;
+      </a>
+      <a href="#platform" class="btn-secondary">
+        Explore Platform &darr;
+      </a>
+    </div>
+  </div>
+
+  <!-- WhatsApp Message Bubbles (Framer Motion Spread) -->
+  <div class="cards-layer" id="cardsLayer">
+    <!-- Bubble 1: Alex (Cloud Architect) -->
+    <div class="wa-bubble" id="card1" data-x="-430" data-y="-220" data-rot="-5">
+      <div class="wa-sender" style="color: #7C3AED;">
+        Alex (Cloud Architect)
+        <span class="wa-sender-tag" style="background: rgba(244, 63, 94, 0.15); color: #E11D48;">Flight Risk</span>
+      </div>
+      <div class="wa-text">
+        Hey team, putting in my two weeks today. Just felt like there wasn't a clear path beyond Senior and compensation fell behind market. 💔
+      </div>
+      <div class="wa-meta">
+        14:28 <span class="wa-check">✓✓</span>
+      </div>
+      <div class="wa-reactions">
+        💔 😢 14
+      </div>
+    </div>
+
+    <!-- Bubble 2: Maya (Mid-Market Sales) -->
+    <div class="wa-bubble" id="card2" data-x="430" data-y="-210" data-rot="4">
+      <div class="wa-sender" style="color: #059669;">
+        Maya (Mid-Market AE)
+        <span class="wa-sender-tag" style="background: rgba(251, 191, 36, 0.15); color: #D97706;">Comp Anomaly</span>
+      </div>
+      <div class="wa-text">
+        Changing the commission accelerators mid-quarter really hurt team trust. A few of the senior AEs are already actively interviewing...
+      </div>
+      <div class="wa-meta">
+        11:05 <span class="wa-check">✓✓</span>
+      </div>
+      <div class="wa-reactions">
+        👀 🤐 8
+      </div>
+    </div>
+
+    <!-- Bubble 3: David (Product Design) -->
+    <div class="wa-bubble" id="card3" data-x="-440" data-y="180" data-rot="3">
+      <div class="wa-sender" style="color: #2563EB;">
+        David (Staff Designer)
+        <span class="wa-sender-tag" style="background: rgba(251, 191, 36, 0.15); color: #D97706;">Silent Drift</span>
+      </div>
+      <div class="wa-text">
+        Honestly feeling isolated working async without real mentorship. Skipped the last two quarterly HR surveys because nothing ever changes.
+      </div>
+      <div class="wa-meta">
+        16:42 <span class="wa-check">✓✓</span>
+      </div>
+      <div class="wa-reactions">
+        😔 🫂 6
+      </div>
+    </div>
+
+    <!-- Bubble 4: RetainlyAI Resolution Playbook -->
+    <div class="wa-bubble wa-bubble-resolution" id="card4" data-x="440" data-y="190" data-rot="-4">
+      <div class="wa-sender" style="color: #0284C7;">
+        People Ops &bull; Retention Action
+        <span class="wa-sender-tag" style="background: rgba(16, 185, 129, 0.2); color: #059669;">Retained</span>
+      </div>
+      <div class="wa-text">
+        Off-cycle compensation leveling approved to 85th percentile + dual-track Tech Lead progression path confirmed. Counter-offers accepted! 🎉
+      </div>
+      <div class="wa-meta">
+        17:15 <span class="wa-check">✓✓</span>
+      </div>
+      <div class="wa-reactions">
+        🎉 🚀 +$180k Saved
+      </div>
+    </div>
+
+    <!-- Bubble 5: Marcus (Backend Lead) -->
+    <div class="wa-bubble" id="card5" data-x="-120" data-y="-320" data-rot="-2">
+      <div class="wa-sender" style="color: #D97706;">
+        Marcus (Backend Lead)
+        <span class="wa-sender-tag" style="background: rgba(244, 63, 94, 0.15); color: #E11D48;">Offer In Hand</span>
+      </div>
+      <div class="wa-text">
+        Recruiter offered +30% with remote flexibility. Loved working here, but inflation made staying unviable.
+      </div>
+      <div class="wa-meta">
+        09:12 <span class="wa-check">✓✓</span>
+      </div>
+      <div class="wa-reactions">
+        🥺 💸 11
+      </div>
+    </div>
+
+    <!-- Bubble 6: Priya (Engineering Manager) -->
+    <div class="wa-bubble" id="card6" data-x="140" data-y="310" data-rot="2">
+      <div class="wa-sender" style="color: #9333EA;">
+        Priya (Eng Director)
+        <span class="wa-sender-tag" style="background: rgba(56, 189, 248, 0.15); color: #0284C7;">Pulse Signal</span>
+      </div>
+      <div class="wa-text">
+        RetainlyAI flagged flight risk in our mid-level backend cohort 3 weeks ago. We adjusted bands before any resignations dropped!
+      </div>
+      <div class="wa-meta">
+        18:04 <span class="wa-check">✓✓</span>
+      </div>
+      <div class="wa-reactions">
+        👏 💡 19
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Framer Motion Animation Controller
+  const cards = [
+    document.getElementById('card1'),
+    document.getElementById('card2'),
+    document.getElementById('card3'),
+    document.getElementById('card4'),
+    document.getElementById('card5'),
+    document.getElementById('card6')
+  ];
+  const centerContent = document.getElementById('centerContent');
+
+  let currentProgress = 0;
+  let targetProgress = 1; // Default to fully fanned out view
+
+  function updatePositions(progress) {
+    // Center element slightly scales and fades in
+    const scale = 0.94 + 0.06 * progress;
+    const opacity = 0.6 + 0.4 * progress;
+    centerContent.style.transform = `scale(${scale})`;
+    centerContent.style.opacity = opacity;
+
+    const centerX = window.innerWidth / 2;
+    const centerY = 450;
+
+    cards.forEach(card => {
+      const targetX = parseFloat(card.getAttribute('data-x'));
+      const targetY = parseFloat(card.getAttribute('data-y'));
+      const rot = parseFloat(card.getAttribute('data-rot'));
+
+      // Interpolate from center (progress = 0) to fanned out (progress = 1)
+      const currentX = targetX * progress;
+      const currentY = targetY * progress;
+      const currentRot = rot * progress;
+
+      // Position relative to center
+      const posX = centerX + currentX - 145; // 145 is half of card width
+      const posY = centerY + currentY - 70;
+
+      card.style.left = `${posX}px`;
+      card.style.top = `${posY}px`;
+      card.style.transform = `rotate(${currentRot}deg)`;
+      card.style.opacity = 0.4 + 0.6 * progress;
+    });
+  }
+
+  // Smooth lerp loop
+  function animate() {
+    currentProgress += (targetProgress - currentProgress) * 0.1;
+    updatePositions(currentProgress);
+    requestAnimationFrame(animate);
+  }
+
+  // Listen to parent or window scroll
+  function handleScroll() {
+    let scrollTop = window.scrollY;
+    try {
+      if (window.parent && window.parent.document) {
+        const parentMain = window.parent.document.querySelector('section[data-testid="stMain"]');
+        if (parentMain) {
+          scrollTop = parentMain.scrollTop;
+        }
+      }
+    } catch(e) {}
+
+    // Map scroll range [0, 400] to progress [0.15, 1.0]
+    const p = Math.min(1, Math.max(0.15, 0.15 + (scrollTop / 350) * 0.85));
+    targetProgress = p;
+  }
+
+  window.addEventListener('scroll', handleScroll, { passive: true });
+  try {
+    if (window.parent && window.parent.document) {
+      const parentMain = window.parent.document.querySelector('section[data-testid="stMain"]');
+      if (parentMain) {
+        parentMain.addEventListener('scroll', handleScroll, { passive: true });
+      }
+    }
+  } catch(e) {}
+
+  window.addEventListener('resize', () => updatePositions(currentProgress));
+
+  // Mouse interactivity / gentle fan on hover
+  document.getElementById('framerHero').addEventListener('mousemove', (e) => {
+    const mouseX = (e.clientX / window.innerWidth) - 0.5;
+    const mouseY = (e.clientY / window.innerHeight) - 0.5;
+    centerContent.style.transform = `translate(${mouseX * 10}px, ${mouseY * 10}px)`;
+  });
+
+  animate();
+  handleScroll();
+</script>
+
+</body>
+</html>

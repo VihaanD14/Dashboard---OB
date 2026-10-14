@@ -1,0 +1,234 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Data Galaxy Loop</title>
+<style>
+  /* Layout: one full-bleed 3D canvas over a navy-charcoal void, vignette on top, a small loop caption bottom-left. */
+  :root {
+    color-scheme: dark;
+    --void: #05080f;
+    --charcoal: #0d1118;
+    --navy: #0a1730;
+    --electric: #2f7bff;
+    --cyan: #3fe6ff;
+    --mist: #8fa6c4;
+    --font-ui: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--void);
+    color: var(--mist);
+    font-family: var(--font-ui);
+    overflow: hidden;
+  }
+  .stage {
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse 70% 60% at 50% 48%, var(--navy) 0%, rgba(10,23,48,0) 70%),
+      radial-gradient(ellipse 120% 90% at 50% 120%, var(--charcoal) 0%, rgba(13,17,24,0) 65%),
+      var(--void);
+  }
+  canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .vignette {
+    position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(ellipse 85% 80% at 50% 50%, rgba(5,8,15,0) 40%, rgba(5,8,15,0.85) 100%);
+  }
+  .caption {
+    position: absolute; left: 16px; bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+    font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+    opacity: 0.55; display: flex; gap: 10px; align-items: center;
+  }
+  .caption i { width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 8px var(--cyan); display: inline-block; }
+</style>
+
+<div class="stage">
+  <canvas id="galaxy" aria-label="Slowly rotating three-dimensional network of glowing blue and cyan data nodes with light pulses traveling along connecting lines"></canvas>
+  <div class="vignette"></div>
+  <div class="caption"><i></i><span id="cap">Data galaxy · seamless loop</span></div>
+</div>
+
+<script>
+(function () {
+  var LOOP = 48;               // seconds; every motion below is periodic over this
+  var TAU = Math.PI * 2;
+  var cv = document.getElementById("galaxy");
+  var ctx = cv.getContext("2d");
+  var W = 0, H = 0, dpr = 1;
+
+  // deterministic RNG so the network is identical on every load
+  var seed = 20261013;
+  function rnd() { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; }
+  function gauss() { return (rnd() + rnd() + rnd() + rnd() - 2) / 2; }
+
+  // ---- nodes: three spiral arms plus a diffuse halo ----
+  var N = 340, nodes = [];
+  for (var i = 0; i < N; i++) {
+    var halo = rnd() < 0.18, x, y, z;
+    if (halo) {
+      var a = rnd() * TAU, b = Math.acos(2 * rnd() - 1), r = 0.35 + rnd() * 0.75;
+      x = r * Math.sin(b) * Math.cos(a); y = r * Math.cos(b) * 0.7; z = r * Math.sin(b) * Math.sin(a);
+    } else {
+      var arm = Math.floor(rnd() * 3), rr = Math.pow(rnd(), 0.75) * 1.05 + 0.04;
+      var th = arm * TAU / 3 + rr * 2.3 + gauss() * 0.42;
+      x = rr * Math.cos(th); z = rr * Math.sin(th);
+      y = gauss() * 0.26 * (1 - rr * 0.45);
+    }
+    nodes.push({
+      x: x, y: y, z: z,
+      kx: 1 + Math.floor(rnd() * 2), ky: 1 + Math.floor(rnd() * 2), kz: 1 + Math.floor(rnd() * 2),
+      px: rnd() * TAU, py: rnd() * TAU, pz: rnd() * TAU,
+      amp: 0.025 + rnd() * 0.04,
+      size: 0.6 + rnd() * 1.1 + (rnd() < 0.06 ? 1.4 : 0),
+      hue: rnd() < 0.45 ? 1 : 0,
+      twk: 1 + Math.floor(rnd() * 3), tph: rnd() * TAU,
+      sx: 0, sy: 0, sd: 0, ss: 0
+    });
+  }
+
+  // ---- edges: nearest neighbours, deduplicated ----
+  var edges = [], seen = {};
+  for (var i2 = 0; i2 < N; i2++) {
+    var ds = [];
+    for (var j = 0; j < N; j++) {
+      if (j === i2) continue;
+      var dx = nodes[i2].x - nodes[j].x, dy = nodes[i2].y - nodes[j].y, dz = nodes[i2].z - nodes[j].z;
+      var d2 = dx * dx + dy * dy + dz * dz;
+      if (d2 < 0.085) ds.push([d2, j]);
+    }
+    ds.sort(function (p, q) { return p[0] - q[0]; });
+    for (var m = 0; m < Math.min(3, ds.length); m++) {
+      var a2 = Math.min(i2, ds[m][1]), b2 = Math.max(i2, ds[m][1]), key = a2 * 1000 + b2;
+      if (seen[key]) continue;
+      seen[key] = 1;
+      var hasPulse = rnd() < 0.42;
+      edges.push({
+        a: a2, b: b2, pulse: hasPulse,
+        pk: 1 + Math.floor(rnd() * 2),           // integer cycles per loop
+        po: rnd(), dir: rnd() < 0.5 ? 1 : -1
+      });
+    }
+  }
+
+  // ---- dust ----
+  var dust = [];
+  for (var q = 0; q < 220; q++) {
+    var aa = rnd() * TAU, bb = Math.acos(2 * rnd() - 1), rd = 0.4 + rnd() * 1.6;
+    dust.push({ x: rd * Math.sin(bb) * Math.cos(aa), y: rd * Math.cos(bb) * 0.8, z: rd * Math.sin(bb) * Math.sin(aa), s: 0.4 + rnd() * 0.8, a: 0.15 + rnd() * 0.35 });
+  }
+
+  // ---- glow sprites ----
+  function sprite(r, g, b) {
+    var c = document.createElement("canvas"); c.width = c.height = 64;
+    var x = c.getContext("2d"), gr = x.createRadialGradient(32, 32, 0, 32, 32, 32);
+    gr.addColorStop(0, "rgba(255,255,255,1)");
+    gr.addColorStop(0.12, "rgba(" + r + "," + g + "," + b + ",0.95)");
+    gr.addColorStop(0.4, "rgba(" + r + "," + g + "," + b + ",0.22)");
+    gr.addColorStop(1, "rgba(" + r + "," + g + "," + b + ",0)");
+    x.fillStyle = gr; x.fillRect(0, 0, 64, 64);
+    return c;
+  }
+  var spBlue = sprite(47, 123, 255), spCyan = sprite(63, 230, 255);
+
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = cv.clientWidth; H = cv.clientHeight;
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+  }
+  window.addEventListener("resize", resize);
+  resize();
+
+  var CAM = 3.4;
+  function frame(u) {
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+    ctx.globalCompositeOperation = "lighter";
+
+    var f = Math.max(W * 0.46, H * 0.82) * 1.55;
+    var cx = W / 2, cy = H / 2;
+    var yaw = u * TAU;
+    var tilt = 0.5 + 0.07 * Math.sin(u * TAU);
+    var cyw = Math.cos(yaw), syw = Math.sin(yaw), ct = Math.cos(tilt), st = Math.sin(tilt);
+
+    function project(x, y, z, out) {
+      var x1 = x * cyw + z * syw, z1 = -x * syw + z * cyw;
+      var y2 = y * ct - z1 * st, z2 = y * st + z1 * ct;
+      var depth = CAM + z2, s = f / depth;
+      out.sx = cx + x1 * s; out.sy = cy + y2 * s; out.sd = depth; out.ss = s;
+    }
+    function depthAlpha(d) {
+      var t = (CAM + 1.4 - d) / 2.8;
+      return Math.max(0.12, Math.min(1, 0.2 + 0.85 * t));
+    }
+
+    // dust
+    var tmp = { sx: 0, sy: 0, sd: 0, ss: 0 };
+    for (var k = 0; k < dust.length; k++) {
+      var p = dust[k]; project(p.x, p.y, p.z, tmp);
+      var da = depthAlpha(tmp.sd);
+      ctx.globalAlpha = p.a * da * 0.7;
+      var sz = p.s * 2.2 * (tmp.ss / f) * 3.4;
+      ctx.drawImage(spBlue, tmp.sx - sz, tmp.sy - sz, sz * 2, sz * 2);
+    }
+
+    // nodes
+    for (var i = 0; i < N; i++) {
+      var n = nodes[i];
+      var x = n.x + Math.sin(u * TAU * n.kx + n.px) * n.amp;
+      var y = n.y + Math.sin(u * TAU * n.ky + n.py) * n.amp;
+      var z = n.z + Math.sin(u * TAU * n.kz + n.pz) * n.amp;
+      project(x, y, z, n);
+    }
+
+    // edges
+    ctx.lineCap = "round";
+    for (var e = 0; e < edges.length; e++) {
+      var ed = edges[e], A = nodes[ed.a], B = nodes[ed.b];
+      var dm = (A.sd + B.sd) / 2, al = depthAlpha(dm);
+      ctx.globalAlpha = al * 0.34;
+      ctx.strokeStyle = "#2f7bff";
+      ctx.lineWidth = Math.max(0.5, 0.9 * (f / dm) / f * 3.2);
+      ctx.beginPath(); ctx.moveTo(A.sx, A.sy); ctx.lineTo(B.sx, B.sy); ctx.stroke();
+
+      if (ed.pulse) {
+        var ph = (u * ed.pk * ed.dir + ed.po) % 1; if (ph < 0) ph += 1;
+        var tail = Math.max(0, ph - 0.14);
+        var hx = A.sx + (B.sx - A.sx) * ph, hy = A.sy + (B.sy - A.sy) * ph;
+        var tx = A.sx + (B.sx - A.sx) * tail, ty = A.sy + (B.sy - A.sy) * tail;
+        var fade = Math.sin(ph * Math.PI);          // pulse dims at both endpoints
+        ctx.globalAlpha = al * 0.9 * fade;
+        ctx.strokeStyle = "#7df0ff";
+        ctx.lineWidth = Math.max(0.8, 1.6 * (f / dm) / f * 3.2);
+        ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(hx, hy); ctx.stroke();
+        var gs = 10 * (f / dm) / f * 3.2;
+        ctx.globalAlpha = al * fade;
+        ctx.drawImage(spCyan, hx - gs, hy - gs, gs * 2, gs * 2);
+      }
+    }
+
+    // node glows (sorted far to near is unnecessary with additive blending)
+    for (var i3 = 0; i3 < N; i3++) {
+      var nd = nodes[i3], a3 = depthAlpha(nd.sd);
+      var tw = 0.78 + 0.22 * Math.sin(u * TAU * nd.twk + nd.tph);
+      var r = nd.size * 5.2 * (nd.ss / f) * 3.2;
+      ctx.globalAlpha = Math.min(1, a3 * tw);
+      ctx.drawImage(nd.hue ? spCyan : spBlue, nd.sx - r, nd.sy - r, r * 2, r * 2);
+    }
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = "source-over";
+  }
+
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduce) {
+    frame(0.12);
+    document.getElementById("cap").textContent = "Data galaxy · still (reduced motion)";
+    window.addEventListener("resize", function () { frame(0.12); });
+  } else {
+    var t0 = performance.now();
+    (function tick(now) {
+      frame((((now - t0) / 1000) % LOOP) / LOOP);
+      requestAnimationFrame(tick);
+    })(t0);
+  }
+})();
+</script>
+
+</body></html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Traditional HR exit analysis loop</title>
+<style>
+:root{--bg:#050b18;--cell:#9fb6d9;--line:#12243f;--red:255,59,70}
+html,body{height:100%;margin:0;background:var(--bg);overflow:hidden}
+.stage{position:fixed;inset:0;perspective:1000px;overflow:hidden}
+.sheet{position:absolute;left:0;top:0;width:2300px;transform:rotateX(12deg) rotateZ(-2deg) scale(1.1);transform-origin:30% 40%;
+ font:13px/1 "SF Mono",Menlo,Consolas,monospace;color:var(--cell);animation:pan 40s ease-in-out infinite alternate}
+@keyframes pan{from{translate:0 0}to{translate:-900px 0}}
+.track{animation:scroll 30s linear infinite;will-change:transform}
+@keyframes scroll{to{transform:translateY(var(--loop))}}
+.row{display:grid;grid-template-columns:70px 90px 150px 120px 130px 140px 80px 70px 100px 130px 520px 90px 130px 90px 110px;height:34px;align-items:center;border-bottom:1px solid var(--line);position:relative;white-space:nowrap}
+.row span{padding:0 10px;overflow:hidden;text-overflow:ellipsis;border-right:1px solid var(--line);height:100%;display:flex;align-items:center}
+.row span:first-child{color:#4a6694}
+.err{color:#ff8f98}.dim{color:#4a6694}.hl{background:rgba(255,214,10,.12)}.bl{background:rgba(60,130,255,.14)}
+.row.risk::after{content:"";position:absolute;inset:0;background:rgba(var(--red),.22);box-shadow:inset 0 0 0 1px rgba(var(--red),.6),0 0 24px rgba(var(--red),.35);opacity:0;animation:flash 4.3s ease-in-out infinite;animation-delay:var(--d)}
+@keyframes flash{0%,100%{opacity:0}12%,30%{opacity:1}50%{opacity:0}}
+.dof{position:fixed;inset:0;pointer-events:none;backdrop-filter:blur(6px);
+ -webkit-mask-image:linear-gradient(#000 0,#000 15%,transparent 35%,transparent 65%,#000 85%,#000 100%);
+ mask-image:linear-gradient(#000 0,#000 15%,transparent 35%,transparent 65%,#000 85%,#000 100%)}
+.light{position:fixed;inset:0;pointer-events:none;
+ background:radial-gradient(70% 55% at 30% 40%,rgba(40,90,200,.25),transparent 70%),radial-gradient(60% 50% at 80% 70%,rgba(20,50,140,.3),transparent 70%),radial-gradient(120% 100% at 50% 50%,rgba(2,5,14,.35) 30%,rgba(2,5,14,.9) 100%)}
+.scan{position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(255,255,255,.015) 0 1px,transparent 1px 3px);mix-blend-mode:screen}
+@media (prefers-reduced-motion:reduce){.sheet,.track{animation-duration:200s}}
+</style></head>
+<body>
+<div class="stage"><div class="sheet"><div class="track" id="track"></div></div></div>
+<div class="dof"></div><div class="light"></div><div class="scan"></div>
+<script>
+let s=11;const r=()=>(s=(s*16807)%2147483647)/2147483647,pick=a=>a[Math.floor(r()*a.length)];
+const names=["A. Rao","M. Chen","S. Okafor","L. Meyer","P. Iyer","J. Silva","K. Tanaka","D. Novak","R. Haddad","E. Brooks","N. Kapoor","T. Larsen","Priya S.","chen, wei"];
+const depts=["Engineering","Sales","Support","Finance","Product","Ops","People","eng","SALES","Cust. Success"];
+const roles=["Analyst","Sr. Engineer","Manager","Lead","Associate","Director","Sr Eng II","Acct Exec"];
+const mgrs=["R. Mehta","B. Alvarez","#N/A","C. Ford","H. Lindqvist","(blank)","V. Rao","Unknown"];
+const reasons=["Better offer","Career growth","Manager","Burnout","Comp","Relocation","Other","Personal","See notes","Restructure","Culture","N/A"];
+const status=["Filed","Pending","Unread","Unread","Filed","Review?","Unread","Closed"];
+const notes=["Role matched expectations; happy with team","Growth path unclear after reorg, no promo in 3 yrs","Workload unsustainable for 3 quarters, asked for help twice","Manager rarely gave feedback; skip-level never happened","Compensation below market, counter-offer came too late","Strong peers but limited promotion; 2 teammates also leaving","Remote policy changed without notice","Burned out, no backfill since March","Accepted offer, 40% increase","Praised onboarding, left for relocation","see attached doc v3","TBD - follow up w/ HR","Felt ideas ignored in planning meetings","Team lead left, no one replaced"];
+const risky=new Set([1,2,3,4,5,6,7,12,13]);
+const dt=()=>{const d=1+Math.floor(r()*28),m=1+Math.floor(r()*12),y=pick([2023,2024,2025]);const f=Math.floor(r()*3);return f==0?`${d}/${m}/${y}`:f==1?`${y}-${String(m).padStart(2,"0")}-${String(d).padStart(2,"0")}`:`${["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][m-1]} ${d}, ${y}`};
+const N=40;let h="";
+for(let i=0;i<N;i++){
+ const n=Math.floor(r()*notes.length),st=pick(status),risk=risky.has(n)&&st!=="Filed"&&st!=="Closed"&&r()>.3;
+ const mg=pick(mgrs),rt=r()>.85?"#REF!":(1+r()*4).toFixed(r()>.5?1:2),cd=r()>.8?"":(r()>.5?"+":"-")+Math.floor(r()*30)+"%";
+ h+=`<div class="row${risk?" risk":""}" style="--d:${(r()*4.3).toFixed(2)}s"><span>${1000+i}</span><span>E${20000+Math.floor(r()*9999)}</span><span>${pick(names)}</span><span>${pick(depts)}</span><span>${pick(roles)}</span><span class="${mg[0]=="#"||mg[0]=="("?"err":""}">${mg}</span><span>${(1+r()*9).toFixed(1)}y</span><span class="${rt[0]=="#"?"err":""}">${rt}</span><span>${dt()}</span><span class="${r()>.8?"hl":""}">${pick(reasons)}</span><span>${notes[n]}</span><span class="${st=="Unread"?"err":"dim"}">${st}</span><span class="${r()>.7?"bl":""}">${cd||""}</span><span class="dim">${r()>.5?"Q"+(1+Math.floor(r()*4)):""}</span><span class="${r()>.85?"err":"dim"}">${r()>.85?"#VALUE!":pick(["","v2","FINAL","copy","v7"])}</span></div>`;
+}
+const t=document.getElementById("track");t.innerHTML=h+h;t.style.setProperty("--loop",`-${N*34}px`);
+</script></body></html>

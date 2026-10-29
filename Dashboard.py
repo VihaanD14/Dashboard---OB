@@ -554,8 +554,13 @@ framer_hero_html = """
     targetMouseY = (e.clientY - halfH) / halfH;
   }, { passive: true });
 
-  // Throttled sync with Streamlit parent scroll (Contracted -> Spread Lerp Track)
+  // Dual-mode scroll tracking:
+  // 1. Direct parent sync (works when same-origin, e.g. localhost)
+  // 2. Wheel/touch delta accumulator (works seamlessly in cross-origin iframes, e.g. Streamlit Cloud)
+  let virtualScroll = 0;
+  let hasParentAccess = false;
   let scrollTicking = false;
+
   function checkParentScroll() {
     if (!scrollTicking) {
       window.requestAnimationFrame(() => {
@@ -563,7 +568,10 @@ framer_hero_html = """
         try {
           if (window.parent && window.parent.document) {
             const parentMain = window.parent.document.querySelector('section[data-testid="stMain"]') || window.parent;
-            if (parentMain) top = parentMain.scrollTop || window.parent.scrollY || 0;
+            if (parentMain) {
+              top = parentMain.scrollTop || window.parent.scrollY || 0;
+              hasParentAccess = true;
+            }
             
             const frame = window.frameElement;
             if (frame) {
@@ -579,8 +587,12 @@ framer_hero_html = """
               }
             }
           }
-        } catch(err) {}
-        targetScrollProgress = Math.min(1.15, Math.max(0.0, top / 340));
+        } catch(err) {
+          hasParentAccess = false;
+        }
+        if (hasParentAccess) {
+          targetScrollProgress = Math.min(1.15, Math.max(0.0, top / 340));
+        }
         scrollTicking = false;
       });
       scrollTicking = true;
@@ -592,9 +604,38 @@ framer_hero_html = """
       const parentMain = window.parent.document.querySelector('section[data-testid="stMain"]') || window.parent;
       if (parentMain) {
         parentMain.addEventListener('scroll', checkParentScroll, { passive: true });
+        hasParentAccess = true;
       }
     }
-  } catch(err) {}
+  } catch(err) {
+    hasParentAccess = false;
+  }
+
+  // Mouse wheel & trackpad listener for cross-origin iframes (Streamlit Community Cloud)
+  window.addEventListener('wheel', (e) => {
+    if (!hasParentAccess) {
+      virtualScroll += e.deltaY * 0.8;
+      virtualScroll = Math.max(0, Math.min(380, virtualScroll));
+      targetScrollProgress = Math.min(1.15, Math.max(0.0, virtualScroll / 300));
+    }
+  }, { passive: true });
+
+  // Touch swipe support for mobile/trackpad devices in cross-origin mode
+  let touchStartY = 0;
+  window.addEventListener('touchstart', (e) => {
+    if (e.touches && e.touches.length > 0) touchStartY = e.touches[0].clientY;
+  }, { passive: true });
+
+  window.addEventListener('touchmove', (e) => {
+    if (!hasParentAccess && e.touches && e.touches.length > 0) {
+      const currentY = e.touches[0].clientY;
+      const diffY = touchStartY - currentY;
+      touchStartY = currentY;
+      virtualScroll += diffY * 1.2;
+      virtualScroll = Math.max(0, Math.min(380, virtualScroll));
+      targetScrollProgress = Math.min(1.15, Math.max(0.0, virtualScroll / 300));
+    }
+  }, { passive: true });
 
   // Responsive scale calculation that preserves outer perimeter
   function getScale() {
@@ -711,6 +752,8 @@ framer_hero_html = """
   }
 
   function scrollToPlatform() {
+    virtualScroll = 340;
+    targetScrollProgress = 1.0;
     try {
       if (window.parent && window.parent.document) {
         const main = window.parent.document.querySelector('section[data-testid="stMain"]');

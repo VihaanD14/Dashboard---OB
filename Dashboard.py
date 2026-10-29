@@ -658,10 +658,14 @@ framer_hero_html = """
       const floatX = Math.cos(dt * 0.0017 + phase) * 2;
       const floatRot = Math.sin(dt * 0.0019 + phase) * 1.2;
 
-      // Dynamic interpolation from contracted state (0) to spread state (1)
-      const interpX = cx + (sx - cx) * scrollProgress;
-      const interpY = cy + (sy - cy) * scrollProgress;
-      const interpRot = crot + (srot - crot) * scrollProgress;
+      // Dynamic Bloom: smooth staggered blossoming from center to perimeter on load + scroll expansion
+      const cardIntro = Math.min(1.0, Math.max(0.0, (introProgress * 1.35) - (phase * 0.07)));
+      const mouseInfluence = Math.min(0.2, Math.hypot(mouseX, mouseY) * 0.18);
+      const bloomProgress = Math.min(1.2, Math.max(cardIntro, scrollProgress) + mouseInfluence);
+
+      const interpX = cx + (sx - cx) * bloomProgress;
+      const interpY = cy + (sy - cy) * bloomProgress;
+      const interpRot = crot + (srot - crot) * bloomProgress;
 
       const spreadX = (interpX * s) + floatX + (mouseX * 12);
       const spreadY = (interpY * s) + floatY + (mouseY * 8);

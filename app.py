@@ -554,11 +554,19 @@ framer_hero_html = """
     targetMouseY = (e.clientY - halfH) / halfH;
   }, { passive: true });
 
-  // Dual-mode scroll tracking:
-  // 1. Direct parent sync (works when same-origin, e.g. localhost)
-  // 2. Wheel/touch delta accumulator (works seamlessly in cross-origin iframes, e.g. Streamlit Cloud)
+  // Helper to find the actual scrolling element in Streamlit (handles <main data-testid="stMain"> and older <section>)
+  function getParentScroller() {
+    try {
+      if (window.parent && window.parent.document) {
+        return window.parent.document.querySelector('[data-testid="stMain"], main#stMain, .stMain, section[data-testid="stMain"]') ||
+               window.parent.document.scrollingElement ||
+               window.parent.document.documentElement;
+      }
+    } catch(e) {}
+    return null;
+  }
+
   let virtualScroll = 0;
-  let hasParentAccess = false;
   let scrollTicking = false;
 
   function checkParentScroll() {
@@ -566,33 +574,31 @@ framer_hero_html = """
       window.requestAnimationFrame(() => {
         let top = 0;
         try {
-          if (window.parent && window.parent.document) {
-            const parentMain = window.parent.document.querySelector('section[data-testid="stMain"]') || window.parent;
-            if (parentMain) {
-              top = parentMain.scrollTop || window.parent.scrollY || 0;
-              hasParentAccess = true;
-            }
-            
-            const frame = window.frameElement;
-            if (frame) {
-              const rect = frame.getBoundingClientRect();
-              const winH = window.parent.innerHeight || 800;
-              const inView = (rect.bottom > -50 && rect.top < winH + 50);
-              if (inView !== isHeroVisible) {
-                isHeroVisible = inView;
-                if (isHeroVisible && !heroRaf) {
-                  startTime = performance.now();
-                  heroRaf = requestAnimationFrame(renderFrame);
-                }
+          const scroller = getParentScroller();
+          if (scroller) {
+            top = scroller.scrollTop || 0;
+          }
+          if (!top && window.parent) {
+            top = window.parent.scrollY || 0;
+          }
+          
+          const frame = window.frameElement;
+          if (frame && window.parent) {
+            const rect = frame.getBoundingClientRect();
+            const winH = window.parent.innerHeight || 800;
+            const inView = (rect.bottom > -50 && rect.top < winH + 50);
+            if (inView !== isHeroVisible) {
+              isHeroVisible = inView;
+              if (isHeroVisible && !heroRaf) {
+                startTime = performance.now();
+                heroRaf = requestAnimationFrame(renderFrame);
               }
             }
           }
-        } catch(err) {
-          hasParentAccess = false;
-        }
-        if (hasParentAccess) {
-          targetScrollProgress = Math.min(1.15, Math.max(0.0, top / 340));
-        }
+        } catch(err) {}
+
+        const effectiveScroll = Math.max(top, virtualScroll);
+        targetScrollProgress = Math.min(1.15, Math.max(0.0, effectiveScroll / 300));
         scrollTicking = false;
       });
       scrollTicking = true;
@@ -600,40 +606,36 @@ framer_hero_html = """
   }
 
   try {
-    if (window.parent && window.parent.document) {
-      const parentMain = window.parent.document.querySelector('section[data-testid="stMain"]') || window.parent;
-      if (parentMain) {
-        parentMain.addEventListener('scroll', checkParentScroll, { passive: true });
-        hasParentAccess = true;
-      }
+    const scroller = getParentScroller();
+    if (scroller) {
+      scroller.addEventListener('scroll', checkParentScroll, { passive: true });
     }
-  } catch(err) {
-    hasParentAccess = false;
-  }
+    if (window.parent) {
+      window.parent.addEventListener('scroll', checkParentScroll, { passive: true });
+    }
+  } catch(err) {}
 
-  // Mouse wheel & trackpad listener for cross-origin iframes (Streamlit Community Cloud)
+  // Direct mouse wheel & trackpad listener over hero viewport
   window.addEventListener('wheel', (e) => {
-    if (!hasParentAccess) {
-      virtualScroll += e.deltaY * 0.8;
-      virtualScroll = Math.max(0, Math.min(380, virtualScroll));
-      targetScrollProgress = Math.min(1.15, Math.max(0.0, virtualScroll / 300));
-    }
+    virtualScroll += e.deltaY * 0.8;
+    virtualScroll = Math.max(0, Math.min(400, virtualScroll));
+    checkParentScroll();
   }, { passive: true });
 
-  // Touch swipe support for mobile/trackpad devices in cross-origin mode
+  // Touch swipe support for mobile
   let touchStartY = 0;
   window.addEventListener('touchstart', (e) => {
     if (e.touches && e.touches.length > 0) touchStartY = e.touches[0].clientY;
   }, { passive: true });
 
   window.addEventListener('touchmove', (e) => {
-    if (!hasParentAccess && e.touches && e.touches.length > 0) {
+    if (e.touches && e.touches.length > 0) {
       const currentY = e.touches[0].clientY;
       const diffY = touchStartY - currentY;
       touchStartY = currentY;
       virtualScroll += diffY * 1.2;
-      virtualScroll = Math.max(0, Math.min(380, virtualScroll));
-      targetScrollProgress = Math.min(1.15, Math.max(0.0, virtualScroll / 300));
+      virtualScroll = Math.max(0, Math.min(400, virtualScroll));
+      checkParentScroll();
     }
   }, { passive: true });
 
@@ -755,14 +757,12 @@ framer_hero_html = """
     virtualScroll = 340;
     targetScrollProgress = 1.0;
     try {
-      if (window.parent && window.parent.document) {
-        const main = window.parent.document.querySelector('section[data-testid="stMain"]');
-        const plat = window.parent.document.getElementById('platform');
-        if (plat && main) {
-          const topPos = plat.getBoundingClientRect().top + main.scrollTop - 70;
-          main.scrollTo({ top: topPos, behavior: 'smooth' });
-          return;
-        }
+      const scroller = getParentScroller();
+      const plat = window.parent.document.getElementById('platform');
+      if (plat && scroller) {
+        const topPos = plat.getBoundingClientRect().top + scroller.scrollTop - 70;
+        scroller.scrollTo({ top: topPos, behavior: 'smooth' });
+        return;
       }
     } catch(err) {}
   }

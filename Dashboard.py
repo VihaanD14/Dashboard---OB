@@ -7,7 +7,7 @@ from utils.splash import show_splash_screen
 
 # Page configuration
 st.set_page_config(
-    page_title=f"RetainlyAI | Predictive Talent Intelligence",
+    page_title=f"RetAIn | Predictive Talent Intelligence",
     page_icon=APP_ICON,
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -15,6 +15,7 @@ st.set_page_config(
 
 # Apply custom CSS
 apply_custom_css()
+st.markdown('<div id="homepage-root"></div>', unsafe_allow_html=True)
 
 # Show splash screen once per session
 show_splash_screen()
@@ -38,8 +39,25 @@ framer_hero_html = """
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..700&family=Instrument+Sans:ital,wght@0,400..600;1,400..600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
+  :root {
+    --font-display: 'Bricolage Grotesque', sans-serif;
+    --font-body: 'Instrument Sans', sans-serif;
+  }
+  .brand {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-size: inherit;
+    font-weight: 700;
+    color: #F8FAFC !important;
+    letter-spacing: -0.02em;
+    display: inline-block;
+  }
+  .brand-ai {
+    color: #38BDF8 !important;
+    font-weight: 800 !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  }
   * {
     box-sizing: border-box;
     margin: 0;
@@ -49,7 +67,7 @@ framer_hero_html = """
   body {
     background-color: transparent;
     color: #F8FAFC;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family: var(--font-body);
     overflow: hidden;
     height: 750px;
     width: 100%;
@@ -68,7 +86,7 @@ framer_hero_html = """
     perspective: 1200px;
   }
 
-  /* Center RetainlyAI Core Pitch */
+  /* Center RetAIn Core Pitch */
   .center-stage {
     position: relative;
     z-index: 25;
@@ -77,6 +95,22 @@ framer_hero_html = """
     padding: 0.2rem 0.4rem;
     pointer-events: auto;
     transition: transform 0.1s ease-out, opacity 0.1s ease-out;
+  }
+
+  /* Soft radial cyan-blue light centered behind the headline */
+  .center-stage::before {
+    content: '';
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px;
+    height: 380px;
+    background: radial-gradient(circle, rgba(34, 211, 238, 0.15) 0%, rgba(59, 130, 246, 0.08) 50%, transparent 70%);
+    filter: blur(60px);
+    -webkit-filter: blur(60px);
+    pointer-events: none;
+    z-index: -1;
   }
 
   .hero-badge {
@@ -97,21 +131,22 @@ framer_hero_html = """
   }
 
   .hero-title {
+    font-family: var(--font-display);
     font-size: 2.3rem;
-    font-weight: 800;
+    font-weight: 700;
     line-height: 1.15;
-    letter-spacing: -0.03em;
+    letter-spacing: -0.01em;
     color: #F8FAFC;
     margin-bottom: 0.85rem;
   }
 
   .hero-title span {
-    background: linear-gradient(135deg, #38BDF8 0%, #818CF8 100%);
+    background: linear-gradient(135deg, #22d3ee 0%, #3b82f6 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
 
-  /* Key RetainlyAI Info Box (Direct User Pitch - Naked Floating Typography) */
+  /* Key RetAIn Info Box (Direct User Pitch - Naked Floating Typography) */
   .hero-key-quote {
     background: transparent;
     border: none;
@@ -153,23 +188,23 @@ framer_hero_html = """
     display: inline-flex;
     align-items: center;
     gap: 0.45rem;
-    background: linear-gradient(135deg, #38BDF8, #0284C7);
+    background: #22d3ee;
     color: #030712;
     font-weight: 700;
     font-size: 0.86rem;
     letter-spacing: -0.01em;
     padding: 0.62rem 1.45rem;
     border-radius: 9999px;
-    border: 1px solid rgba(56, 189, 248, 0.65);
-    box-shadow: 0 0 20px rgba(56, 189, 248, 0.4), 0 4px 14px rgba(2, 132, 199, 0.3);
+    border: 1px solid rgba(34, 211, 238, 0.8);
+    box-shadow: 0 0 12px rgba(34, 211, 238, 0.50), 0 0 28px rgba(34, 211, 238, 0.50);
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .btn-pill-primary:hover {
-    background: linear-gradient(135deg, #7DD3FC, #0EA5E9);
+    background: #67e8f9;
     color: #030712;
     transform: translateY(-2px);
-    box-shadow: 0 0 28px rgba(56, 189, 248, 0.6), 0 6px 20px rgba(2, 132, 199, 0.45);
+    box-shadow: 0 0 16px rgba(34, 211, 238, 0.80), 0 0 36px rgba(34, 211, 238, 0.65);
   }
 
   .btn-pill-secondary {
@@ -182,16 +217,17 @@ framer_hero_html = """
     font-size: 0.84rem;
     padding: 0.56rem 1.2rem;
     border-radius: 9999px;
-    border: 1px solid rgba(56, 189, 248, 0.28);
+    border: 1px solid rgba(34, 211, 238, 0.40);
     backdrop-filter: blur(12px);
     cursor: pointer;
     transition: all 0.2s ease;
   }
   .btn-pill-secondary:hover {
-    border-color: rgba(56, 189, 248, 0.6);
+    border-color: rgba(34, 211, 238, 0.85);
     background: rgba(15, 23, 42, 0.95);
     color: #FFFFFF;
     transform: translateY(-2px);
+    box-shadow: 0 0 14px rgba(34, 211, 238, 0.35);
   }
 
   /* WhatsApp Message Layer */
@@ -205,19 +241,26 @@ framer_hero_html = """
     z-index: 10;
   }
 
-  /* Authentic WhatsApp Message Bubble Matching User Reference Image */
+  /* Authentic WhatsApp Message Bubble Matching User Reference Image (EXCLUSION: Keeps original font) */
+  .wa-card,
+  .wa-card * {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  }
+
   .wa-card {
     position: absolute;
+    top: 0;
+    left: 0;
     width: 224px;
     background: #FFFFFF;
     color: #111827;
     border-radius: 12px;
     padding: 8px 11px 12px 11px;
-    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.2), 0 0 20px rgba(56, 189, 248, 0.12);
     pointer-events: auto;
     cursor: pointer;
-    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s ease;
-    will-change: transform, left, top;
+    transition: box-shadow 0.22s ease;
+    will-change: transform;
     border: 1px solid rgba(255, 255, 255, 0.9);
   }
 
@@ -328,7 +371,7 @@ framer_hero_html = """
 <body>
 
 <div class="framer-hero-viewport" id="framerHero">
-  <!-- Center RetainlyAI Pitch -->
+  <!-- Center RetAIn Pitch -->
   <div class="center-stage" id="centerStage">
     <h1 class="hero-title">
       Stop Losing Key Talent <br><span>Before They Leave.</span>
@@ -336,7 +379,7 @@ framer_hero_html = """
 
     <div class="hero-key-quote">
       <p class="hero-key-text">
-        RetainlyAI decodes <span class="highlight-cyan">silent exit signals</span> and turns team sentiment into <span class="highlight-white">high-ROI retention playbooks</span> before resignation letters hit your desk.
+        <span class="brand">Ret<span class="brand-ai">AI</span>n</span> decodes <span class="highlight-cyan">silent exit signals</span> and turns team sentiment into <span class="highlight-white">high-ROI retention playbooks</span> before resignation letters hit your desk.
       </p>
     </div>
 
@@ -440,7 +483,7 @@ framer_hero_html = """
     <div class="wa-card tail-left" id="card7" data-cx="-290" data-cy="200" data-sx="-520" data-sy="215" data-crot="4" data-srot="7" data-phase="5.8">
       <div class="wa-sender" style="color: #9333EA;">Priya Patel</div>
       <div class="wa-body">
-        RetainlyAI flagged flight risk in our mid-level backend cohort 3 weeks ago. We leveled bands and retained everyone before notices hit! 👏
+        RetAIn flagged flight risk in our mid-level backend cohort 3 weeks ago. We leveled bands and retained everyone before notices hit! 👏
       </div>
       <div class="wa-meta">
         18:04 <span class="wa-ticks">✓✓</span>
@@ -510,37 +553,44 @@ framer_hero_html = """
     const halfH = 370;
     targetMouseX = (e.clientX - halfW) / halfW;
     targetMouseY = (e.clientY - halfH) / halfH;
-  });
-
-  // Wheel forwarding to parent Streamlit container so scrolling is never trapped
-  window.addEventListener('wheel', (e) => {
-    try {
-      if (window.parent && window.parent.document) {
-        const parentMain = window.parent.document.querySelector('section[data-testid="stMain"]');
-        if (parentMain) {
-          parentMain.scrollTop += e.deltaY;
-        }
-      }
-    } catch(err) {}
   }, { passive: true });
 
-  // Sync with Streamlit parent scroll (Contracted -> Spread Lerp Track)
+  // Throttled sync with Streamlit parent scroll (Contracted -> Spread Lerp Track)
+  let scrollTicking = false;
   function checkParentScroll() {
-    let top = 0;
-    try {
-      if (window.parent && window.parent.document) {
-        const parentMain = window.parent.document.querySelector('section[data-testid="stMain"]');
-        if (parentMain) top = parentMain.scrollTop;
-      }
-    } catch(err) {}
-
-    // When user scrolls down (0px to 340px), cards fan out from contracted (0.0) to fully spread (1.0)
-    targetScrollProgress = Math.min(1.15, Math.max(0.0, top / 340));
+    if (!scrollTicking) {
+      window.requestAnimationFrame(() => {
+        let top = 0;
+        try {
+          if (window.parent && window.parent.document) {
+            const parentMain = window.parent.document.querySelector('section[data-testid="stMain"]') || window.parent;
+            if (parentMain) top = parentMain.scrollTop || window.parent.scrollY || 0;
+            
+            const frame = window.frameElement;
+            if (frame) {
+              const rect = frame.getBoundingClientRect();
+              const winH = window.parent.innerHeight || 800;
+              const inView = (rect.bottom > -50 && rect.top < winH + 50);
+              if (inView !== isHeroVisible) {
+                isHeroVisible = inView;
+                if (isHeroVisible && !heroRaf) {
+                  startTime = performance.now();
+                  heroRaf = requestAnimationFrame(renderFrame);
+                }
+              }
+            }
+          }
+        } catch(err) {}
+        targetScrollProgress = Math.min(1.15, Math.max(0.0, top / 340));
+        scrollTicking = false;
+      });
+      scrollTicking = true;
+    }
   }
 
   try {
     if (window.parent && window.parent.document) {
-      const parentMain = window.parent.document.querySelector('section[data-testid="stMain"]');
+      const parentMain = window.parent.document.querySelector('section[data-testid="stMain"]') || window.parent;
       if (parentMain) {
         parentMain.addEventListener('scroll', checkParentScroll, { passive: true });
       }
@@ -558,8 +608,26 @@ framer_hero_html = """
   }
 
   let startTime = performance.now();
+  let isHeroVisible = true;
+  let heroRaf = null;
+
+  try {
+    const heroObserver = new IntersectionObserver((entries) => {
+      isHeroVisible = entries[0].isIntersecting;
+      if (isHeroVisible && !heroRaf) {
+        startTime = performance.now();
+        heroRaf = requestAnimationFrame(renderFrame);
+      }
+    }, { threshold: 0.02 });
+    heroObserver.observe(document.body);
+  } catch(e) {}
 
   function renderFrame(now) {
+    if (!isHeroVisible) {
+      heroRaf = null;
+      return;
+    }
+
     const dt = now - startTime;
 
     // Framer Spring Lerp physics
@@ -603,13 +671,17 @@ framer_hero_html = """
       const posX = centerX + spreadX - 112; // 112 is half of 224px card width
       const posY = centerY + spreadY - 50;
 
-      card.style.left = `${posX}px`;
-      card.style.top = `${posY}px`;
-      card.style.transform = `scale(${s}) rotate(${spreadRot}deg)`;
+      // Safe bounds padding to ensure bubbles NEVER cut off at window edges
+      const cardW = 224 * s;
+      const minX = 16;
+      const maxX = Math.max(minX, window.innerWidth - cardW - 16);
+      const safeX = Math.max(minX, Math.min(maxX, posX));
+
+      card.style.transform = `translate3d(${safeX}px, ${posY}px, 0) scale(${s}) rotate(${spreadRot}deg)`;
       card.style.opacity = Math.min(1.0, 0.45 + introProgress * 0.55);
     });
 
-    requestAnimationFrame(renderFrame);
+    heroRaf = requestAnimationFrame(renderFrame);
   }
 
   function navigateParentToPortal() {
@@ -648,7 +720,7 @@ framer_hero_html = """
     } catch(err) {}
   }
 
-  requestAnimationFrame(renderFrame);
+  heroRaf = requestAnimationFrame(renderFrame);
 </script>
 
 </body>
@@ -671,8 +743,25 @@ retention_loop_html = """
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..700&family=Instrument+Sans:ital,wght@0,400..600;1,400..600&display=swap" rel="stylesheet">
 <style>
+  :root {
+    --font-display: 'Bricolage Grotesque', sans-serif;
+    --font-body: 'Instrument Sans', sans-serif;
+  }
+  .brand {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-size: inherit;
+    font-weight: 700;
+    color: #F8FAFC !important;
+    letter-spacing: -0.02em;
+    display: inline-block;
+  }
+  .brand-ai {
+    color: #38BDF8 !important;
+    font-weight: 800 !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  }
   * {
     box-sizing: border-box;
     margin: 0;
@@ -685,7 +774,7 @@ retention_loop_html = """
     overflow: hidden;
     background-color: transparent;
     color: #F8FAFC;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family: var(--font-body);
   }
 
   .galaxy-section {
@@ -733,11 +822,7 @@ retention_loop_html = """
   }
 
   .section-divider-bottom {
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent 0%, rgba(56, 189, 248, 0.25) 50%, transparent 100%);
-    z-index: 5;
+    display: none;
   }
 
   /* Foreground Content Container */
@@ -776,9 +861,10 @@ retention_loop_html = """
   }
 
   .section-title {
+    font-family: var(--font-display);
     font-size: 2.3rem;
-    font-weight: 800;
-    letter-spacing: -0.03em;
+    font-weight: 700;
+    letter-spacing: -0.01em;
     color: #F8FAFC;
     margin: 0 0 0.5rem 0;
     line-height: 1.18;
@@ -849,6 +935,7 @@ retention_loop_html = """
   }
 
   .loop-card-title {
+    font-family: var(--font-display);
     font-size: 1.24rem;
     font-weight: 700;
     color: #F8FAFC;
@@ -892,11 +979,8 @@ retention_loop_html = """
   <!-- Foreground Content -->
   <div class="content-container">
     <div class="section-header">
-      <div class="kicker-badge">
-        <span>✦</span> THE AUTONOMOUS RETENTION LOOP
-      </div>
       <h2 class="section-title">
-        How RetainlyAI Protects Your Workforce
+        How <span class="brand">Ret<span class="brand-ai">AI</span>n</span> Protects Your Workforce
       </h2>
       <p class="section-subtitle">
         Closing the loop between why past employees left and how your current team feels right now.
@@ -948,19 +1032,7 @@ retention_loop_html = """
 </div>
 
 <script>
-  // Forward wheel events to parent container so scrolling is never trapped
-  window.addEventListener('wheel', (e) => {
-    try {
-      if (window.parent && window.parent.document) {
-        const parentMain = window.parent.document.querySelector('section[data-testid="stMain"]');
-        if (parentMain) {
-          parentMain.scrollTop += e.deltaY;
-        }
-      }
-    } catch(err) {}
-  }, { passive: true });
-
-  // 3D Data Galaxy Loop Canvas Engine - Widescreen Orbit & Stretched Projection
+  // 3D Data Galaxy Loop Canvas Engine - High Performance & Dynamic Viewport Throttle
   (function () {
     var LOOP = 48; // seconds
     var TAU = Math.PI * 2;
@@ -972,7 +1044,7 @@ retention_loop_html = """
     function rnd() { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; }
     function gauss() { return (rnd() + rnd() + rnd() + rnd() - 2) / 2; }
 
-    var N = 480, nodes = [];
+    var N = 240, nodes = [];
     for (var i = 0; i < N; i++) {
       var halo = rnd() < 0.22, x, y, z;
       if (halo) {
@@ -1020,7 +1092,7 @@ retention_loop_html = """
     }
 
     var dust = [];
-    for (var q = 0; q < 280; q++) {
+    for (var q = 0; q < 120; q++) {
       var aa = rnd() * TAU, bb = Math.acos(2 * rnd() - 1), rd = 0.5 + rnd() * 2.2;
       dust.push({ x: rd * Math.sin(bb) * Math.cos(aa), y: rd * Math.cos(bb) * 0.8, z: rd * Math.sin(bb) * Math.sin(aa), s: 0.45 + rnd() * 0.9, a: 0.18 + rnd() * 0.4 });
     }
@@ -1038,7 +1110,7 @@ retention_loop_html = """
     var spBlue = sprite(47, 123, 255), spCyan = sprite(63, 230, 255);
 
     function resize() {
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      dpr = Math.min(window.devicePixelRatio || 1, 1.25);
       W = cv.clientWidth; H = cv.clientHeight;
       cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
     }
@@ -1121,16 +1193,50 @@ retention_loop_html = """
       ctx.globalCompositeOperation = "source-over";
     }
 
+    var isGalaxyVisible = true;
+    var galaxyRaf = null;
+
+    function checkGalaxyVisibility() {
+      try {
+        var frame = window.frameElement;
+        if (frame && window.parent) {
+          var rect = frame.getBoundingClientRect();
+          var winH = window.parent.innerHeight || 800;
+          var inView = (rect.bottom > -80 && rect.top < winH + 80);
+          if (inView !== isGalaxyVisible) {
+            isGalaxyVisible = inView;
+            if (isGalaxyVisible && !galaxyRaf) {
+              t0 = performance.now();
+              galaxyRaf = requestAnimationFrame(tick);
+            }
+          }
+        }
+      } catch(e) {}
+    }
+
+    try {
+      if (window.parent && window.parent.document) {
+        var parentMain = window.parent.document.querySelector('section[data-testid="stMain"]') || window.parent;
+        parentMain.addEventListener('scroll', checkGalaxyVisibility, { passive: true });
+        window.parent.addEventListener('resize', checkGalaxyVisibility, { passive: true });
+      }
+    } catch(e) {}
+
     var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduce) {
       frame(0.12);
       window.addEventListener("resize", function () { frame(0.12); });
     } else {
       var t0 = performance.now();
-      (function tick(now) {
+      function tick(now) {
+        if (!isGalaxyVisible) {
+          galaxyRaf = null;
+          return;
+        }
         frame((((now - t0) / 1000) % LOOP) / LOOP);
-        requestAnimationFrame(tick);
-      })(t0);
+        galaxyRaf = requestAnimationFrame(tick);
+      }
+      galaxyRaf = requestAnimationFrame(tick);
     }
   })();
 </script>
@@ -1141,9 +1247,9 @@ retention_loop_html = """
 components.html(retention_loop_html, height=690, scrolling=False)
 
 # ==============================================================================
-# SECTION 4: WHY RETAINLYAI - BACKGROUND METAMORPHOSIS & BENTO PLATFORM
+# SECTION 4: WHY RETAIN - BACKGROUND METAMORPHOSIS & BENTO PLATFORM
 # ==============================================================================
-st.markdown('<div id="why-retainly"></div><div id="why-us"></div>', unsafe_allow_html=True)
+st.markdown('<div id="why-retain"></div><div id="why-us"></div>', unsafe_allow_html=True)
 
 scroll_transition_html = """
 <!DOCTYPE html>
@@ -1156,9 +1262,30 @@ scroll_transition_html = """
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..700&family=Instrument+Sans:ital,wght@0,400..600;1,400..600&display=swap" rel="stylesheet">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --font-display: 'Bricolage Grotesque', sans-serif;
+    --font-body: 'Instrument Sans', sans-serif;
+    --sheet-bg: #050b18;
+    --cell-color: #9fb6d9;
+    --line-color: #12243f;
+    --red-alert: 255, 59, 70;
+  }
+  .brand {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-size: inherit;
+    font-weight: 700;
+    color: #F8FAFC !important;
+    letter-spacing: -0.02em;
+    display: inline-block;
+  }
+  .brand-ai {
+    color: #38BDF8 !important;
+    font-weight: 800 !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  }
   html, body {
     width: 100%;
     height: 100%;
@@ -1167,18 +1294,8 @@ scroll_transition_html = """
     overflow: hidden;
     background-color: #030712;
     color: #F8FAFC;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family: var(--font-body);
     user-select: none;
-  }
-
-  /* ==========================================================================
-     LAYER 1: TRADITIONAL HR EXCEL LOOP STYLES
-     ========================================================================== */
-  :root {
-    --sheet-bg: #050b18;
-    --cell-color: #9fb6d9;
-    --line-color: #12243f;
-    --red-alert: 255, 59, 70;
   }
   .excel-stage {
     position: absolute;
@@ -1195,14 +1312,14 @@ scroll_transition_html = """
     transform: translate(-50%, -50%) rotateX(15deg) rotateZ(-3deg) scale(1.22);
     font: 13px/1 "SF Mono", Menlo, Consolas, monospace;
     color: var(--cell-color);
-    animation: excelPan 48s ease-in-out infinite alternate;
+    animation: excelPan 65s ease-in-out infinite alternate;
   }
   @keyframes excelPan {
     from { translate: 0 0; }
-    to { translate: -1100px 0; }
+    to { translate: -700px 0; }
   }
   .excel-track {
-    animation: excelScroll 32s linear infinite;
+    animation: excelScroll 55s linear infinite;
     will-change: transform;
   }
   @keyframes excelScroll {
@@ -1235,16 +1352,16 @@ scroll_transition_html = """
     content: "";
     position: absolute;
     inset: 0;
-    background: rgba(var(--red-alert), 0.28);
-    box-shadow: inset 0 0 0 1px rgba(var(--red-alert), 0.65), 0 0 28px rgba(var(--red-alert), 0.45);
+    background: rgba(var(--red-alert), 0.22);
+    box-shadow: inset 0 0 0 1px rgba(var(--red-alert), 0.50), 0 0 20px rgba(var(--red-alert), 0.30);
     opacity: 0;
-    animation: excelFlash 4.2s ease-in-out infinite;
+    animation: excelFlash 5.5s ease-in-out infinite;
     animation-delay: var(--d, 0s);
   }
   @keyframes excelFlash {
     0%, 100% { opacity: 0; }
-    12%, 30% { opacity: 1; }
-    50% { opacity: 0; }
+    15%, 32% { opacity: 0.9; }
+    55% { opacity: 0; }
   }
   .excel-dof {
     position: absolute;
@@ -1294,10 +1411,10 @@ scroll_transition_html = """
     height: 100%;
     display: grid;
     grid-template-rows: auto auto 1fr;
-    gap: 10px;
-    max-width: 1500px;
+    gap: 12px;
+    max-width: 100%;
     margin: 0 auto;
-    padding: 14px 20px;
+    padding: 24px 36px;
     pointer-events: none;
     box-sizing: border-box;
   }
@@ -1307,9 +1424,10 @@ scroll_transition_html = """
     align-items: center;
   }
   .wp-title {
+    font-family: var(--font-display);
     font-size: 14px;
     font-weight: 600;
-    letter-spacing: 0.2px;
+    letter-spacing: -0.01em;
     color: #cfe0ff;
   }
   .wp-live {
@@ -1318,7 +1436,7 @@ scroll_transition_html = """
     gap: 8px;
     font-size: 11px;
     color: #7f97bd;
-    font-family: monospace;
+    font-family: var(--font-body);
   }
   .wp-dot {
     width: 7px;
@@ -1431,17 +1549,23 @@ scroll_transition_html = """
 
   /* Frosted Glass Bento Capability Card */
   .bento-card-interactive {
-    background: rgba(11, 17, 32, 0.88);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(56, 189, 248, 0.22);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.55), inset 0 0 15px rgba(56, 189, 248, 0.04);
-    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    background: rgba(10, 20, 45, 0.45);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    height: 170px;
+    box-sizing: border-box;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                background 0.35s ease,
+                border-color 0.35s ease;
+    overflow: hidden;
   }
   .bento-card-interactive:hover {
-    border-color: rgba(56, 189, 248, 0.65);
-    box-shadow: 0 12px 40px rgba(56, 189, 248, 0.16), inset 0 0 25px rgba(56, 189, 248, 0.08);
+    background: rgba(10, 20, 45, 0.65);
     transform: translateY(-2px);
+    border-color: rgba(56, 189, 248, 0.25);
   }
 </style>
 </head>
@@ -1489,7 +1613,7 @@ scroll_transition_html = """
         const rt = r() > 0.85 ? "#REF!" : (1 + r() * 4).toFixed(1);
         const cd = r() > 0.8 ? "" : (r() > 0.5 ? "+" : "-") + Math.floor(r() * 30) + "%";
         rowsHtml += `
-          <div class="excel-row ${risk ? "risk" : ""}" style="--d: ${(r() * 4.2).toFixed(2)}s">
+          <div class="excel-row ${risk ? "risk" : ""}" style="--d: ${(r() * 5.5).toFixed(2)}s">
             <span>${1000 + i}</span>
             <span>E${20000 + Math.floor(r() * 9999)}</span>
             <span>${pick(names)}</span>
@@ -1512,27 +1636,28 @@ scroll_transition_html = """
 
     // MAIN TRANSITION COMPONENT
     function TransitionComponent() {
-      const [progress, setProgress] = useState(0); // 0 = Traditional HR Excel, 1 = RetainlyAI Platform
+      const [progress, setProgress] = useState(0); // 0 = Traditional HR Excel, 1 = RetAIn Platform
 
-      // Simultaneous Typewriter Effect
+      // Simultaneous Typewriter Effect (Replays whenever scrolled into view)
       const fullText = "Billions lost to silent resignations, buried in endless spreadsheets.";
       const [typedText, setTypedText] = useState("");
-      const isTypingActiveRef = useRef(false);
 
       const triggerTypewriter = () => {
-        if (isTypingActiveRef.current) return;
-        isTypingActiveRef.current = true;
+        if (window._typewriterTimer) {
+          clearInterval(window._typewriterTimer);
+          window._typewriterTimer = null;
+        }
         setTypedText("");
         let idx = 0;
-        if (window._typewriterTimer) clearInterval(window._typewriterTimer);
         window._typewriterTimer = setInterval(() => {
           if (idx <= fullText.length) {
             setTypedText(fullText.slice(0, idx));
             idx++;
           } else {
             clearInterval(window._typewriterTimer);
+            window._typewriterTimer = null;
           }
-        }, 36);
+        }, 34);
       };
 
       // Populate Spreadsheet Rows on Mount
@@ -1759,8 +1884,24 @@ scroll_transition_html = """
           if (d4) d4.innerHTML = `<span style="color:#7f97bd">Next 90 days</span>`;
         }
 
-        let loopRaf;
+        let isSection4Visible = true;
+        let loopRaf = null;
+
+        try {
+          const obs4 = new IntersectionObserver((entries) => {
+            isSection4Visible = entries[0].isIntersecting;
+            if (isSection4Visible && !loopRaf) {
+              loopRaf = requestAnimationFrame(loop);
+            }
+          }, { threshold: 0.02 });
+          obs4.observe(document.body);
+        } catch(e) {}
+
         function loop(now) {
+          if (!isSection4Visible) {
+            loopRaf = null;
+            return;
+          }
           const u = ((now / 1000) % T) / T;
           drawLine(u);
           drawAI(u);
@@ -1772,11 +1913,11 @@ scroll_transition_html = """
 
         return () => {
           window.removeEventListener('resize', rs);
-          cancelAnimationFrame(loopRaf);
+          if (loopRaf) cancelAnimationFrame(loopRaf);
         };
       }, []);
 
-      // Scroll physics with Calibrated Timing Balance
+      // Scroll physics with Calibrated Timing Balance & Zero-Jank Throttling
       useEffect(() => {
         let parentWin, parentDoc, scroller;
         try {
@@ -1793,39 +1934,71 @@ scroll_transition_html = """
 
         let targetP = 0;
         let currentP = 0;
-        let rafId;
+        let lastReportedP = -1;
+        let rafId = null;
+        let scrollTicking = false;
+        let hasExitedAbove = true;
+        let hasExitedBelow = false;
 
         const checkInViewAndScroll = () => {
-          try {
-            const frame = window.frameElement;
-            if (!frame) return;
-            const rect = frame.getBoundingClientRect();
-            const winH = parentWin.innerHeight || window.innerHeight;
+          if (!scrollTicking) {
+            window.requestAnimationFrame(() => {
+              try {
+                const frame = window.frameElement;
+                if (!frame) return;
+                const rect = frame.getBoundingClientRect();
+                const winH = parentWin.innerHeight || window.innerHeight;
 
-            // Trigger typewriter effect as section approaches viewport
-            if (rect.top < winH * 0.95 && rect.bottom > 80) {
-              triggerTypewriter();
-            }
+                const isAbove = rect.top >= winH * 0.75;
+                const isBelow = rect.bottom <= 100;
+                const isInView = rect.top < winH * 0.75 && rect.bottom > 100;
 
-            // CALIBRATED SCROLL TIMING:
-            // When rect.top >= 320px: user comfortably views the Excel sheet + live typewriter subtitle (progress = 0)
-            // When rect.top moves from 320px down to 70px: smooth background metamorphosis & Bento emergence
-            // When rect.top <= 70px: settled state (progress = 1.0).
-            // Height is 590px, so 70px + 590px = 660px, fits 100% inside monitor with ALL 4 Bento cards completely visible!
-            const startY = 320;
-            const endY = 70;
-            const raw = (startY - rect.top) / (startY - endY);
-            targetP = Math.max(0, Math.min(1, raw));
-          } catch (err) {}
+                if (isAbove) {
+                  hasExitedAbove = true;
+                }
+                if (isBelow) {
+                  hasExitedBelow = true;
+                }
+
+                if (isInView && (hasExitedAbove || hasExitedBelow)) {
+                  hasExitedAbove = false;
+                  hasExitedBelow = false;
+                  triggerTypewriter();
+                }
+
+                const startY = 200;
+                const endY = 50;
+                const raw = (startY - rect.top) / (startY - endY);
+                targetP = Math.max(0, Math.min(1, raw));
+                
+                // Wake up tick animation loop only while actively moving
+                if (!isTickingActive) {
+                  isTickingActive = true;
+                  rafId = requestAnimationFrame(tick);
+                }
+              } catch (err) {}
+              scrollTicking = false;
+            });
+            scrollTicking = true;
+          }
         };
 
+        let isTickingActive = false;
         const tick = () => {
-          currentP += (targetP - currentP) * 0.1;
+          currentP += (targetP - currentP) * 0.16;
           if (Math.abs(targetP - currentP) < 0.001) {
             currentP = targetP;
           }
-          setProgress(currentP);
-          rafId = requestAnimationFrame(tick);
+          // Optimized render threshold: silky smooth 60fps without redundant React reconciliations
+          if (Math.abs(currentP - lastReportedP) > 0.003) {
+            lastReportedP = currentP;
+            setProgress(currentP);
+          }
+          if (Math.abs(targetP - currentP) >= 0.001) {
+            rafId = requestAnimationFrame(tick);
+          } else {
+            isTickingActive = false;
+          }
         };
 
         const targetEl = (scroller && scroller.addEventListener) ? scroller : parentWin;
@@ -1834,46 +2007,48 @@ scroll_transition_html = """
         }
         window.addEventListener('resize', checkInViewAndScroll);
         checkInViewAndScroll();
-        rafId = requestAnimationFrame(tick);
 
         return () => {
           if (targetEl && targetEl.removeEventListener) {
             targetEl.removeEventListener('scroll', checkInViewAndScroll);
           }
           window.removeEventListener('resize', checkInViewAndScroll);
-          cancelAnimationFrame(rafId);
+          if (rafId) cancelAnimationFrame(rafId);
+          if (window._typewriterTimer) {
+            clearInterval(window._typewriterTimer);
+            window._typewriterTimer = null;
+          }
         };
       }, []);
 
-      // Dynamic Metamorphosis Opacities & Transforms
-      // Excel layer fades out
-      const excelOpacity = Math.max(0, 1 - progress * 1.5);
-      const excelBlur = progress * 6;
+      // Dynamic Metamorphosis Opacities & Transforms (Hardware-accelerated)
+      // DWELL ZONE: Excel layer stays 100% visible for the initial scroll segment
+      const excelOpacity = progress < 0.22 ? 1 : Math.max(0, 1 - (progress - 0.22) * 1.6);
 
-      // Text 1 (Traditional HR Headline + Typewriter) fades cleanly before Bento appears
-      const text1Opacity = Math.max(0, 1 - progress * 2.5);
-      const text1Y = -progress * 30;
+      // Text 1 (Traditional HR Headline + Typewriter) stays crystal clear during dwell, then cleanly dissolves before Bento arrives
+      const text1Opacity = progress < 0.25 ? 1 : Math.max(0, 1 - (progress - 0.25) * 2.5);
+      const text1Y = progress < 0.25 ? 0 : -(progress - 0.25) * 35;
 
-      // Layer 2: Workforce Pulse Dashboard Loop fades in
-      const pulseOpacity = Math.min(1, progress * 1.5);
+      // Layer 2: Workforce Pulse Dashboard Loop gently emerges after Excel begins softening
+      const pulseOpacity = progress < 0.2 ? 0 : Math.min(1, (progress - 0.2) * 1.5);
 
-      // Layer 3: RetainlyAI Platform + 4 Bento Cards emerge after Traditional HR clears
-      const bentoProgress = Math.min(1, Math.max(0, (progress - 0.32) / 0.68));
+      // Layer 3: RetAIn Platform + 4 Bento Cards emerge after Traditional HR clears
+      const bentoProgress = Math.min(1, Math.max(0, (progress - 0.45) / 0.55));
       const bentoOpacity = bentoProgress;
-      const bentoY = (1 - bentoProgress) * 25;
-      const bentoScale = 0.97 + bentoProgress * 0.03;
+      const bentoY = (1 - bentoProgress) * 20;
+      const bentoScale = 0.98 + bentoProgress * 0.02;
 
       return React.createElement('div', {
-        className: 'relative w-full h-[590px] overflow-hidden bg-[#030712] border-y border-slate-800/80 shadow-[0_20px_50px_rgba(0,0,0,0.9)]'
+        className: 'relative w-full h-[780px] overflow-hidden bg-[#030712]'
       },
         // ====================================================================
-        // BACKGROUND LAYER 1: 100% FULL-SCREEN 3D EXCEL SPREADSHEET LOOP
+        // BACKGROUND LAYER 1: 100% FULL-SCREEN 3D EXCEL SPREADSHEET LOOP (GPU-Accelerated)
         // ====================================================================
         React.createElement('div', {
           className: 'absolute inset-0 w-full h-full pointer-events-none will-change-transform',
           style: {
             opacity: excelOpacity,
-            filter: `blur(${excelBlur}px)`,
+            transform: 'translate3d(0, 0, 0)',
             display: excelOpacity <= 0 ? 'none' : 'block'
           }
         },
@@ -1975,22 +2150,25 @@ scroll_transition_html = """
         // FOREGROUND 1: TRADITIONAL HR HEADLINE + ACTIVE TYPEWRITER SUBTITLE
         // ====================================================================
         React.createElement('div', {
-          className: 'absolute inset-0 z-20 w-full h-full flex flex-col justify-center items-center text-center px-6 pointer-events-none will-change-transform',
+          className: 'absolute inset-0 z-20 w-full h-full flex flex-col justify-start items-center text-center pt-12 md:pt-16 lg:pt-20 px-6 pointer-events-none will-change-transform',
           style: {
             opacity: text1Opacity,
             transform: `translateY(${text1Y}px)`,
             display: text1Opacity <= 0 ? 'none' : 'flex'
           }
         },
-          // Top Badge
-          React.createElement('div', {
-            className: 'inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold tracking-wider uppercase border border-sky-400/35 bg-sky-400/10 text-sky-400 shadow-[0_0_20px_rgba(56,189,248,0.25)] mb-4'
-          }, '✦ The Strategic Advantage'),
-
           // Hero Headline on Top + Active Simultaneous Typewriter Subtitle
           React.createElement('div', { className: 'max-w-4xl' },
             React.createElement('h2', {
-              className: 'text-3xl md:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight mb-4 drop-shadow-[0_4px_16px_rgba(0,0,0,0.95)]'
+              className: 'text-3xl md:text-5xl lg:text-6xl font-black tracking-tight leading-tight mb-4',
+              style: {
+                fontFamily: 'var(--font-display)',
+                letterSpacing: '-0.025em',
+                background: 'linear-gradient(135deg, #FFFFFF 65%, #38BDF8 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                filter: 'drop-shadow(0 4px 16px rgba(0,0,0,0.95))'
+              }
             }, 'Why Traditional HR Systems Fail'),
             React.createElement('div', {
               className: 'text-slate-200 text-lg md:text-2xl font-medium tracking-wide min-h-[44px] flex items-center justify-center drop-shadow-[0_2px_8px_rgba(0,0,0,0.95)]'
@@ -2002,10 +2180,10 @@ scroll_transition_html = """
         ),
 
         // ====================================================================
-        // FOREGROUND 2: RETAINLYAI PLATFORM + 4 SEPARATELY PLACED BENTO CARDS
+        // FOREGROUND 2: RETAIN PLATFORM + 4 SEPARATELY PLACED BENTO CARDS
         // ====================================================================
         React.createElement('div', {
-          className: 'absolute inset-0 z-20 w-full h-full flex flex-col justify-between p-6 md:p-8 will-change-transform',
+          className: 'absolute inset-0 z-20 w-full h-full flex flex-col justify-center p-6 md:p-10 will-change-transform',
           style: {
             opacity: bentoOpacity,
             transform: `translateY(${bentoY}px) scale(${bentoScale})`,
@@ -2013,114 +2191,298 @@ scroll_transition_html = """
             display: bentoOpacity <= 0 ? 'none' : 'flex'
           }
         },
-          // Top Bar Header
-          React.createElement('div', { className: 'w-full max-w-6xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-sky-500/20 pb-3' },
-            React.createElement('div', null,
-              React.createElement('div', {
-                className: 'text-xs font-bold uppercase tracking-widest text-sky-400 flex items-center gap-2 mb-1'
-              },
-                React.createElement('span', { className: 'w-2 h-2 rounded-full bg-sky-400 shadow-[0_0_8px_#38bdf8]' }),
-                'RetainlyAI Platform'
-              ),
-              React.createElement('h3', {
-                className: 'text-2xl md:text-3xl font-extrabold text-white tracking-tight'
-              }, 'Proactive, Continuous & High-ROI')
-            ),
-            React.createElement('div', { className: 'flex items-center gap-3' },
-              React.createElement('span', {
-                className: 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-sky-400/15 text-sky-300 border border-sky-400/35 shadow-[0_0_15px_rgba(56,189,248,0.3)]'
-              }, '✦ AI Native'),
-              React.createElement('span', {
-                className: 'text-xs font-mono px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-              }, 'Pre-Emption: 90 Days Early')
-            )
+          // Header: Proactive, Continuous & High-ROI
+          React.createElement('div', {
+            className: 'w-full max-w-7xl mx-auto flex items-center justify-between pb-4 md:pb-5 px-1 -mt-4 md:-mt-6'
+          },
+            React.createElement('h3', {
+              className: 'text-3xl md:text-4xl lg:text-[2.35rem] font-extrabold tracking-tight',
+              style: {
+                fontFamily: 'var(--font-display)',
+                letterSpacing: '-0.025em',
+                lineHeight: '1.2',
+                background: 'linear-gradient(135deg, #FFFFFF 65%, #38BDF8 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                filter: 'drop-shadow(0 2px 12px rgba(0,0,0,0.85))'
+              }
+            }, 'Proactive, Continuous & High-ROI')
           ),
 
-          // 4 Separately Placed Bento Capability Cards (2x2 Grid)
+          // 4 Proactive, Continuous & High-ROI Bento Capability Cards (2x2 Grid with generous column spacing)
           React.createElement('div', {
-            className: 'w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-3.5 flex-1 my-3'
+            className: 'w-full max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-7 my-2 px-1'
           },
             // Bento Card 1: Continuous NLP Mining
             React.createElement('div', {
-              className: 'bento-card-interactive p-4 md:p-5 rounded-2xl flex flex-col justify-between'
+              className: 'bento-card-interactive flex flex-row items-center justify-between p-5 md:p-6 w-full'
             },
-              React.createElement('div', null,
-                React.createElement('div', { className: 'flex items-center justify-between mb-2.5' },
-                  React.createElement('span', { className: 'text-[11px] font-mono uppercase tracking-wider text-sky-400 font-bold' }, '01 • Qualitative Mining'),
-                  React.createElement('div', { className: 'flex items-end gap-1 h-3.5' },
-                    [4, 8, 12, 6, 14, 9].map((h, i) =>
-                      React.createElement('span', {
-                        key: i,
-                        className: 'w-1 bg-sky-400 rounded-full animate-pulse',
-                        style: { height: `${h}px`, animationDelay: `${i * 0.15}s` }
-                      })
-                    )
-                  )
-                ),
-                React.createElement('h4', { className: 'text-lg font-bold text-white mb-1.5' }, 'Continuous NLP Mining'),
-                React.createElement('p', { className: 'text-sm text-slate-300 leading-relaxed' },
-                  'Converts raw qualitative feedback into trend signals'
-                )
+              React.createElement('div', {
+                className: 'flex flex-col justify-start h-full pt-4',
+                style: { width: '62%', flexShrink: 0, paddingRight: '10px' }
+              },
+                React.createElement('h4', {
+                  className: 'text-lg md:text-[1.14rem] font-bold text-white mb-2 whitespace-nowrap',
+                  style: { fontFamily: 'var(--font-display)', letterSpacing: '-0.01em' }
+                }, 'Continuous NLP Mining'),
+                React.createElement('p', {
+                  className: 'text-xs md:text-sm font-normal leading-relaxed truncate',
+                  style: { color: '#E2E8F0' }
+                }, 'Converts qualitative feedback into trend signals')
               ),
-              React.createElement('div', { className: 'text-[11px] font-mono text-sky-400/80 pt-2 border-t border-slate-800/80' },
-                'Signal Velocity: Real-time Theme Extraction'
+              React.createElement('div', {
+                className: 'flex items-center justify-center flex-shrink-0',
+                style: { width: '38%', height: '140px', boxSizing: 'border-box' }
+              },
+                React.createElement('div', {
+                  style: { display: 'flex', flexDirection: 'column', gap: '8px', width: '100%', maxWidth: '140px' }
+                },
+                  React.createElement('div', { style: { display: 'flex', gap: '5px', alignItems: 'center' } },
+                    React.createElement('div', { style: { height: '6px', width: '32px', borderRadius: '3px', background: 'rgba(255, 255, 255, 0.12)' } }),
+                    React.createElement('div', { style: { height: '14px', width: '60px', borderRadius: '3px', background: 'rgba(56, 189, 248, 0.18)', border: '1px solid rgba(56, 189, 248, 0.35)' } }),
+                    React.createElement('div', { style: { height: '6px', width: '20px', borderRadius: '3px', background: 'rgba(255, 255, 255, 0.08)' } })
+                  ),
+                  React.createElement('div', { style: { display: 'flex', gap: '5px', alignItems: 'center' } },
+                    React.createElement('div', { style: { height: '14px', width: '48px', borderRadius: '3px', background: 'rgba(56, 189, 248, 0.18)', border: '1px solid rgba(56, 189, 248, 0.35)' } }),
+                    React.createElement('div', { style: { height: '6px', width: '56px', borderRadius: '3px', background: 'rgba(255, 255, 255, 0.12)' } })
+                  ),
+                  React.createElement('div', { style: { marginTop: '4px' } },
+                    React.createElement('span', {
+                      style: {
+                        display: 'inline-block',
+                        fontSize: '10px',
+                        fontFamily: 'var(--font-body)',
+                        color: 'rgba(56, 189, 248, 0.85)',
+                        border: '1px solid rgba(56, 189, 248, 0.35)',
+                        borderRadius: '4px',
+                        padding: '2px 7px',
+                        letterSpacing: '0.03em'
+                      }
+                    }, 'comp drift')
+                  )
+                )
               )
             ),
 
             // Bento Card 2: Privacy-First Cohort Radar
             React.createElement('div', {
-              className: 'bento-card-interactive p-4 md:p-5 rounded-2xl flex flex-col justify-between'
+              className: 'bento-card-interactive flex flex-row items-center justify-between p-5 md:p-6 w-full'
             },
-              React.createElement('div', null,
-                React.createElement('div', { className: 'flex items-center justify-between mb-2.5' },
-                  React.createElement('span', { className: 'text-[11px] font-mono uppercase tracking-wider text-sky-400 font-bold' }, '02 • Cohort Risk Engine'),
-                  React.createElement('span', { className: 'text-xs px-2 py-0.5 rounded bg-sky-400/10 text-sky-300 border border-sky-400/20' }, '5+ Staff Guard')
-                ),
-                React.createElement('h4', { className: 'text-lg font-bold text-white mb-1.5' }, 'Privacy-First Cohort Radar'),
-                React.createElement('p', { className: 'text-sm text-slate-300 leading-relaxed' },
-                  'Team-level early flight risk detection'
-                )
+              React.createElement('div', {
+                className: 'flex flex-col justify-start h-full pt-4',
+                style: { width: '62%', flexShrink: 0, paddingRight: '10px' }
+              },
+                React.createElement('h4', {
+                  className: 'text-lg md:text-[1.14rem] font-bold text-white mb-2 whitespace-nowrap',
+                  style: { fontFamily: 'var(--font-display)', letterSpacing: '-0.01em' }
+                }, 'Privacy-First Cohort Radar'),
+                React.createElement('p', {
+                  className: 'text-xs md:text-sm font-normal leading-relaxed truncate',
+                  style: { color: '#E2E8F0' }
+                }, 'Team-level early flight risk detection')
               ),
-              React.createElement('div', { className: 'text-[11px] font-mono text-emerald-400/90 pt-2 border-t border-slate-800/80' },
-                'Protection: Zero Individual PII Tracking'
+              React.createElement('div', {
+                className: 'flex items-center justify-center flex-shrink-0',
+                style: { width: '38%', height: '140px', boxSizing: 'border-box' }
+              },
+                React.createElement('div', {
+                  style: {
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(5, 14px)',
+                    gap: '4px'
+                  }
+                },
+                  [
+                    'cyan', 'cyan', 'cyan', 'amber', 'cyan',
+                    'cyan', 'amber', 'cyan', 'cyan', 'red',
+                    'cyan', 'cyan', 'cyan', 'cyan', 'cyan',
+                    'cyan', 'red', 'cyan', 'amber', 'cyan'
+                  ].map((type, idx) => {
+                    let bg = 'rgba(56, 189, 248, 0.15)';
+                    if (type === 'amber') bg = 'rgba(245, 158, 11, 0.60)';
+                    if (type === 'red') bg = 'rgba(239, 68, 68, 0.60)';
+                    return React.createElement('div', {
+                      key: idx,
+                      style: {
+                        width: '14px',
+                        height: '14px',
+                        borderRadius: '3px',
+                        background: bg
+                      }
+                    });
+                  })
+                )
               )
             ),
 
             // Bento Card 3: Pre-Emptive Micro-Pulses
             React.createElement('div', {
-              className: 'bento-card-interactive p-4 md:p-5 rounded-2xl flex flex-col justify-between'
+              className: 'bento-card-interactive flex flex-row items-center justify-between p-5 md:p-6 w-full'
             },
-              React.createElement('div', null,
-                React.createElement('div', { className: 'flex items-center justify-between mb-2.5' },
-                  React.createElement('span', { className: 'text-[11px] font-mono uppercase tracking-wider text-sky-400 font-bold' }, '03 • Pulse Velocity'),
-                  React.createElement('span', { className: 'text-xs text-sky-300 font-bold' }, '< 45 Seconds')
-                ),
-                React.createElement('h4', { className: 'text-lg font-bold text-white mb-1.5' }, 'Pre-Emptive Micro-Pulses'),
-                React.createElement('p', { className: 'text-sm text-slate-300 leading-relaxed' },
-                  'Non leading 2 question checks'
-                )
+              React.createElement('div', {
+                className: 'flex flex-col justify-start h-full pt-4',
+                style: { width: '62%', flexShrink: 0, paddingRight: '10px' }
+              },
+                React.createElement('h4', {
+                  className: 'text-lg md:text-[1.14rem] font-bold text-white mb-2 whitespace-nowrap',
+                  style: { fontFamily: 'var(--font-display)', letterSpacing: '-0.01em' }
+                }, 'Pre-Emptive Micro-Pulses'),
+                React.createElement('p', {
+                  className: 'text-xs md:text-sm font-normal leading-relaxed truncate',
+                  style: { color: '#E2E8F0' }
+                }, 'Non leading 2 question checks')
               ),
-              React.createElement('div', { className: 'text-[11px] font-mono text-sky-400/80 pt-2 border-t border-slate-800/80' },
-                'Response Rate: 94% Minimal Friction'
+              React.createElement('div', {
+                className: 'flex items-center justify-center flex-shrink-0',
+                style: { width: '38%', height: '140px', boxSizing: 'border-box' }
+              },
+                React.createElement('div', {
+                  style: { display: 'flex', flexDirection: 'column', width: '100%', maxWidth: '120px' }
+                },
+                  React.createElement('div', {
+                    style: {
+                      alignSelf: 'flex-start',
+                      width: '94px',
+                      height: '22px',
+                      borderRadius: '7px 7px 7px 2px',
+                      background: 'rgba(56, 189, 248, 0.12)',
+                      border: '1px solid rgba(56, 189, 248, 0.22)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      padding: '0 8px'
+                    }
+                  },
+                    React.createElement('div', { style: { height: '4px', width: '56px', borderRadius: '2px', background: 'rgba(56, 189, 248, 0.35)' } })
+                  ),
+                  React.createElement('div', {
+                    style: {
+                      alignSelf: 'flex-end',
+                      width: '68px',
+                      height: '20px',
+                      marginTop: '6px',
+                      borderRadius: '7px 7px 2px 7px',
+                      background: 'rgba(56, 189, 248, 0.18)',
+                      border: '1px solid rgba(56, 189, 248, 0.30)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      padding: '0 8px'
+                    }
+                  },
+                    React.createElement('div', { style: { height: '4px', width: '38px', borderRadius: '2px', background: 'rgba(56, 189, 248, 0.45)' } })
+                  ),
+                  React.createElement('div', {
+                    style: {
+                      width: '100%',
+                      height: '2px',
+                      borderRadius: '1px',
+                      background: 'rgba(255, 255, 255, 0.10)',
+                      marginTop: '12px',
+                      overflow: 'hidden',
+                      position: 'relative'
+                    }
+                  },
+                    React.createElement('div', {
+                      style: { width: '40%', height: '100%', background: '#38bdf8', opacity: 0.65, borderRadius: '1px' }
+                    })
+                  )
+                )
               )
             ),
 
             // Bento Card 4: Modeled Action Playbooks
             React.createElement('div', {
-              className: 'bento-card-interactive p-4 md:p-5 rounded-2xl flex flex-col justify-between'
+              className: 'bento-card-interactive flex flex-row items-center justify-between p-5 md:p-6 w-full'
             },
-              React.createElement('div', null,
-                React.createElement('div', { className: 'flex items-center justify-between mb-2.5' },
-                  React.createElement('span', { className: 'text-[11px] font-mono uppercase tracking-wider text-sky-400 font-bold' }, '04 • Retention Engine'),
-                  React.createElement('span', { className: 'text-xs text-emerald-400 font-bold' }, 'SHRM Aligned')
-                ),
-                React.createElement('h4', { className: 'text-lg font-bold text-white mb-1.5' }, 'Modeled Action Playbooks'),
-                React.createElement('p', { className: 'text-sm text-slate-300 leading-relaxed' },
-                  'Targeted, policy-aligned interventions mapped to company guidelines.'
-                )
+              React.createElement('div', {
+                className: 'flex flex-col justify-start h-full pt-4',
+                style: { width: '62%', flexShrink: 0, paddingRight: '10px' }
+              },
+                React.createElement('h4', {
+                  className: 'text-lg md:text-[1.14rem] font-bold text-white mb-2 whitespace-nowrap',
+                  style: { fontFamily: 'var(--font-display)', letterSpacing: '-0.01em' }
+                }, 'Modeled Action Playbooks'),
+                React.createElement('p', {
+                  className: 'text-xs md:text-sm font-normal leading-relaxed truncate',
+                  style: { color: '#E2E8F0' }
+                }, 'Targeted, policy-aligned retention playbooks')
               ),
-              React.createElement('div', { className: 'text-[11px] font-mono text-sky-400/80 pt-2 border-t border-slate-800/80' },
-                'Outcome: Maximum Long-term Retention ROI'
+              React.createElement('div', {
+                className: 'flex items-center justify-center flex-shrink-0',
+                style: { width: '38%', height: '140px', boxSizing: 'border-box' }
+              },
+                React.createElement('div', {
+                  style: { display: 'flex', flexDirection: 'column', gap: '9px', width: '100%', maxWidth: '125px' }
+                },
+                  React.createElement('div', { style: { display: 'flex', alignItems: 'center', gap: '7px' } },
+                    React.createElement('div', {
+                      style: {
+                        width: '15px',
+                        height: '15px',
+                        borderRadius: '50%',
+                        border: '1.5px solid rgba(56, 189, 248, 0.70)',
+                        background: 'rgba(56, 189, 248, 0.14)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0
+                      }
+                    },
+                      React.createElement('svg', {
+                        width: '8', height: '8', viewBox: '0 0 10 10', fill: 'none'
+                      },
+                        React.createElement('path', {
+                          d: 'M2 5.2L4.2 7.4L8.2 2.6',
+                          stroke: '#38bdf8',
+                          strokeWidth: '1.8',
+                          strokeLinecap: 'round',
+                          strokeLinejoin: 'round'
+                        })
+                      )
+                    ),
+                    React.createElement('div', { style: { height: '5px', width: '78px', borderRadius: '3px', background: 'rgba(255, 255, 255, 0.14)' } })
+                  ),
+                  React.createElement('div', { style: { display: 'flex', alignItems: 'center', gap: '7px' } },
+                    React.createElement('div', {
+                      style: {
+                        width: '15px',
+                        height: '15px',
+                        borderRadius: '50%',
+                        border: '1.5px solid rgba(56, 189, 248, 0.70)',
+                        background: 'rgba(56, 189, 248, 0.14)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0
+                      }
+                    },
+                      React.createElement('svg', {
+                        width: '8', height: '8', viewBox: '0 0 10 10', fill: 'none'
+                      },
+                        React.createElement('path', {
+                          d: 'M2 5.2L4.2 7.4L8.2 2.6',
+                          stroke: '#38bdf8',
+                          strokeWidth: '1.8',
+                          strokeLinecap: 'round',
+                          strokeLinejoin: 'round'
+                        })
+                      )
+                    ),
+                    React.createElement('div', { style: { height: '5px', width: '64px', borderRadius: '3px', background: 'rgba(255, 255, 255, 0.14)' } })
+                  ),
+                  React.createElement('div', { style: { display: 'flex', alignItems: 'center', gap: '7px' } },
+                    React.createElement('div', {
+                      style: {
+                        width: '15px',
+                        height: '15px',
+                        borderRadius: '50%',
+                        border: '1.5px solid rgba(255, 255, 255, 0.22)',
+                        background: 'transparent',
+                        flexShrink: 0
+                      }
+                    }),
+                    React.createElement('div', { style: { height: '5px', width: '52px', borderRadius: '3px', background: 'rgba(255, 255, 255, 0.08)' } })
+                  )
+                )
               )
             )
           )
@@ -2134,99 +2496,107 @@ scroll_transition_html = """
 </html>
 """
 
-components.html(scroll_transition_html, height=590, scrolling=False)
+components.html(scroll_transition_html, height=780, scrolling=False)
 
 # ==============================================================================
 # SECTION 5: CONTACT & STAKEHOLDER DEMO INQUIRY
 # ==============================================================================
-st.markdown('<div id="contact"></div>', unsafe_allow_html=True)
+st.markdown('<div id="contact"><span id="contact-section-anchor"></span></div>', unsafe_allow_html=True)
 
-cont_left, cont_right = st.columns([1, 1], gap="large")
+cont_left, cont_right = st.columns([1.08, 0.92], gap="large")
 
 with cont_left:
-    contact_left_html = """<div class="pilot-left-col" style="padding-top: 0.5rem;">
-<div style="font-size: 0.8rem; font-weight: 700; color: #38BDF8; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.4rem;">
-ENTERPRISE PILOTING &amp; PRODUCTION
-</div>
-<h2 style="font-size: 2.15rem; font-weight: 800; color: #FFFFFF; line-height: 1.2; letter-spacing: -0.025em; margin-bottom: 0.6rem;">
-How RetainlyAI Works in Real-World Deployment
+    contact_left_html = """<div class="pilot-left-col">
+<h2 style="font-size: 2.1rem; font-weight: 700; color: #FFFFFF; line-height: 1.22; letter-spacing: -0.01em; margin-bottom: 0.65rem; font-family: var(--font-display);">
+How <span class="brand">Ret<span class="brand-ai">AI</span>n</span> Works in Real-World Deployment
 </h2>
-<p style="color: #94A3B8; font-size: 0.95rem; line-height: 1.55; margin-bottom: 1.5rem;">
-How our prototype transitions into an automated enterprise system for large organizations.
+<p style="color: #94A3B8; font-size: 0.94rem; line-height: 1.6; margin-bottom: 1.4rem;">
+Turn predictive telemetry into closed-loop enterprise retention workflows.
 </p>
 
-<!-- 3 Core Real-World Capabilities -->
-<div style="display: flex; flex-direction: column; gap: 0.85rem; margin-bottom: 1.5rem;">
-<!-- Capability 1 -->
-<div style="background: rgba(11, 15, 25, 0.72); border: 1px solid rgba(56, 189, 248, 0.22); border-radius: 12px; padding: 1.1rem 1.25rem; transition: all 0.2s ease;">
-<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.35rem;">
-<div style="font-size: 0.75rem; font-family: monospace; font-weight: 700; color: #38BDF8; letter-spacing: 0.05em; text-transform: uppercase;">
-01 &bull; HRMS API SYNC
-</div>
-<span style="font-size: 0.72rem; padding: 2px 8px; border-radius: 9999px; background: rgba(56, 189, 248, 0.12); color: #38BDF8; border: 1px solid rgba(56, 189, 248, 0.25);">Workday / SAP / BambooHR</span>
-</div>
-<div style="font-size: 1.02rem; font-weight: 700; color: #F8FAFC; margin-bottom: 0.35rem;">
-Automated HRMS API Integration
-</div>
-<p style="color: #94A3B8; font-size: 0.88rem; line-height: 1.5; margin: 0;">
-Direct API sync with Workday, SAP SuccessFactors, and BambooHR. Ingests promotion timelines, compensation bands, and exit logs automatically without manual CSV files.
-</p>
+<!-- Vertical Deployment Pipeline -->
+<div class="pipeline-container" style="display: flex; flex-direction: column; margin-bottom: 1.4rem;">
+  <!-- Step 1: HRMS API SYNC -->
+  <div class="pipeline-step pipeline-step-1" style="position: relative; padding-left: 28px; padding-bottom: 32px; background: transparent; border: none; border-radius: 0;">
+    <div class="pipeline-line" style="position: absolute; left: 14px; top: 37px; bottom: -1px; width: 1px; background-color: rgba(56, 189, 248, 0.20);"></div>
+    <div class="pipeline-node" style="position: absolute; left: 9.5px; top: 32px; width: 10px; height: 10px; border-radius: 50%; background-color: #38BDF8; z-index: 2;"></div>
+    <div class="pipeline-header" style="display: flex; align-items: center; justify-content: space-between; height: 20px; margin-bottom: 6px; gap: 0.5rem;">
+      <span class="pipeline-label" style="font-size: 0.74rem; font-weight: 600; color: #94A3B8; letter-spacing: 0.05em; text-transform: uppercase; font-family: inherit;">
+        HRMS API SYNC
+      </span>
+    </div>
+    <div class="pipeline-title" style="font-size: 1.02rem; font-weight: 700; color: #F8FAFC; margin-bottom: 0.35rem; line-height: 1.35;">
+      Automated HRMS Bi-Directional Sync
+    </div>
+    <p class="pipeline-desc" style="color: #94A3B8; font-size: 0.87rem; line-height: 1.52; margin: 0;">
+      Continuously pulls compensation bands, tenure milestones, and exit sentiment directly from your HRIS, eliminating manual CSV uploads and stale spreadsheets.
+    </p>
+  </div>
+
+  <!-- Step 2: DISPATCH ENGINE -->
+  <div class="pipeline-step pipeline-step-2" style="position: relative; padding-left: 28px; padding-bottom: 32px; background: transparent; border: none; border-radius: 0;">
+    <div class="pipeline-line" style="position: absolute; left: 14px; top: 0; bottom: -1px; width: 1px; background-color: rgba(56, 189, 248, 0.20);"></div>
+    <div class="pipeline-node" style="position: absolute; left: 9.5px; top: 32px; width: 10px; height: 10px; border-radius: 50%; background-color: #38BDF8; z-index: 2;"></div>
+    <div class="pipeline-header" style="display: flex; align-items: center; justify-content: space-between; height: 20px; margin-bottom: 6px; gap: 0.5rem;">
+      <span class="pipeline-label" style="font-size: 0.74rem; font-weight: 600; color: #94A3B8; letter-spacing: 0.05em; text-transform: uppercase; font-family: inherit;">
+        DISPATCH ENGINE
+      </span>
+    </div>
+    <div class="pipeline-title" style="font-size: 1.02rem; font-weight: 700; color: #F8FAFC; margin-bottom: 0.35rem; line-height: 1.35;">
+      Autonomous Micro-Pulse Dispatch
+    </div>
+    <p class="pipeline-desc" style="color: #94A3B8; font-size: 0.87rem; line-height: 1.52; margin: 0;">
+      Triggers targeted, two-question pulses via Slack, Teams, or email the moment flight velocity spikes in an at-risk cohort.
+    </p>
+  </div>
+
+  <!-- Step 3: POLICY RAG ENGINE -->
+  <div class="pipeline-step pipeline-step-3" style="position: relative; padding-left: 28px; padding-bottom: 32px; background: transparent; border: none; border-radius: 0;">
+    <div class="pipeline-line" style="position: absolute; left: 14px; top: 0; bottom: -1px; width: 1px; background-color: rgba(56, 189, 248, 0.20);"></div>
+    <div class="pipeline-node" style="position: absolute; left: 9.5px; top: 32px; width: 10px; height: 10px; border-radius: 50%; background-color: #38BDF8; z-index: 2;"></div>
+    <div class="pipeline-header" style="display: flex; align-items: center; justify-content: space-between; height: 20px; margin-bottom: 6px; gap: 0.5rem;">
+      <span class="pipeline-label" style="font-size: 0.74rem; font-weight: 600; color: #94A3B8; letter-spacing: 0.05em; text-transform: uppercase; font-family: inherit;">
+        POLICY RAG ENGINE
+      </span>
+    </div>
+    <div class="pipeline-title" style="font-size: 1.02rem; font-weight: 700; color: #F8FAFC; margin-bottom: 0.35rem; line-height: 1.35;">
+      Policy-Grounded Action Playbooks
+    </div>
+    <p class="pipeline-desc" style="color: #94A3B8; font-size: 0.87rem; line-height: 1.52; margin: 0;">
+      Grounds recommendations in your company handbooks and SHRM standards via RAG, generating compliant, hallucination-free retention roadmaps.
+    </p>
+  </div>
+
+  <!-- Step 4: PRIVACY & TRUST -->
+  <div class="pipeline-step pipeline-step-4" style="position: relative; padding-left: 28px; padding-bottom: 0; background: transparent; border: none; border-radius: 0;">
+    <div class="pipeline-line" style="position: absolute; left: 14px; top: 0; height: 37px; width: 1px; background-color: rgba(56, 189, 248, 0.20);"></div>
+    <div class="pipeline-node pipeline-node-end" style="position: absolute; left: 9.5px; top: 32px; width: 10px; height: 10px; border-radius: 50%; background-color: #34D399; z-index: 2;"></div>
+    <div class="pipeline-header" style="display: flex; align-items: center; justify-content: space-between; height: 20px; margin-bottom: 6px; gap: 0.5rem;">
+      <span class="pipeline-label" style="font-size: 0.74rem; font-weight: 600; color: #94A3B8; letter-spacing: 0.05em; text-transform: uppercase; font-family: inherit;">
+        PRIVACY &amp; TRUST
+      </span>
+    </div>
+    <div class="pipeline-title" style="font-size: 1.02rem; font-weight: 700; color: #F8FAFC; margin-bottom: 0.35rem; line-height: 1.35;">
+      The 5-Person Anti-Retaliation Shield
+    </div>
+    <p class="pipeline-desc" style="color: #94A3B8; font-size: 0.87rem; line-height: 1.52; margin: 0;">
+      Never scores or reports on individuals; all outputs are aggregated at cohort level with a minimum of 5 responses. Individual-level text (exit notes, retros) is processed only to extract thematic clusters and is not accessible to managers.
+    </p>
+  </div>
 </div>
 
-<!-- Capability 2 -->
-<div style="background: rgba(11, 15, 25, 0.72); border: 1px solid rgba(56, 189, 248, 0.22); border-radius: 12px; padding: 1.1rem 1.25rem; transition: all 0.2s ease;">
-<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.35rem;">
-<div style="font-size: 0.75rem; font-family: monospace; font-weight: 700; color: #38BDF8; letter-spacing: 0.05em; text-transform: uppercase;">
-02 &bull; DISPATCH ENGINE
-</div>
-<span style="font-size: 0.72rem; padding: 2px 8px; border-radius: 9999px; background: rgba(46, 230, 166, 0.12); color: #2EE6A6; border: 1px solid rgba(46, 230, 166, 0.25);">&lt; 45s Micro-Pulses</span>
-</div>
-<div style="font-size: 1.02rem; font-weight: 700; color: #F8FAFC; margin-bottom: 0.35rem;">
-Autonomous Micro-Survey Dispatch (Slack / Teams / Email API)
-</div>
-<p style="color: #94A3B8; font-size: 0.88rem; line-height: 1.5; margin: 0;">
-When friction is detected, the AI automatically targets the affected department, generates 2 non-leading pulse questions, and dispatches them directly to employee Slack or email inboxes via API.
-</p>
-</div>
-
-<!-- Capability 3 -->
-<div style="background: rgba(11, 15, 25, 0.72); border: 1px solid rgba(56, 189, 248, 0.22); border-radius: 12px; padding: 1.1rem 1.25rem; transition: all 0.2s ease;">
-<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.35rem;">
-<div style="font-size: 0.75rem; font-family: monospace; font-weight: 700; color: #38BDF8; letter-spacing: 0.05em; text-transform: uppercase;">
-03 &bull; PRIVACY &amp; TRUST
-</div>
-<span style="font-size: 0.72rem; padding: 2px 8px; border-radius: 9999px; background: rgba(56, 189, 248, 0.12); color: #38BDF8; border: 1px solid rgba(56, 189, 248, 0.25);">Differential Privacy</span>
-</div>
-<div style="font-size: 1.02rem; font-weight: 700; color: #F8FAFC; margin-bottom: 0.35rem;">
-The 5-Person Anti-Retaliation Shield
-</div>
-<p style="color: #94A3B8; font-size: 0.88rem; line-height: 1.5; margin: 0;">
-Protects psychological safety by stripping all personal names and automatically merging feedback for teams smaller than 5 people, guaranteeing no manager can ever identify who submitted feedback.
-</p>
-</div>
-</div>
-
-<!-- Interactive Demonstration Gateway Card -->
-<div style="background: rgba(11, 17, 32, 0.82); border: 1px solid rgba(56, 189, 248, 0.35); border-radius: 14px; padding: 1.25rem 1.4rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45), inset 0 0 15px rgba(56, 189, 248, 0.05);">
-<div style="font-size: 0.92rem; color: #E2E8F0; line-height: 1.5; margin-bottom: 0.85rem; font-weight: 500;">
-Evaluate our active demonstration environment with pre-loaded enterprise scenarios:
-</div>
-<a href="/Enterprise_Dashboard" target="_self" class="neone-pill-btn" style="display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none;">
-Launch Enterprise Portal &rarr;
-</a>
-</div>
 </div>"""
     st.markdown(contact_left_html, unsafe_allow_html=True)
 
 with cont_right:
-    st.markdown("""
-    <div class="glass-card" style="padding: 1.75rem 2rem;">
-    <h3 style="margin-top: 0; font-size: 1.3rem;">Request Stakeholder Demo</h3>
-    <p style="color: #94A3B8; font-size: 0.88rem; margin-bottom: 1.25rem;">
-    Get a tailored briefing on your company's attrition risk profile.
-    </p>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown("""<div class="pilot-right-col">
+<h2 style="font-size: 2.1rem; font-weight: 700; color: #FFFFFF; line-height: 1.22; letter-spacing: -0.01em; margin-bottom: 0.65rem; font-family: var(--font-display);">
+Request Stakeholder Demo
+</h2>
+<p style="color: #94A3B8; font-size: 0.94rem; line-height: 1.6; margin-bottom: 1.4rem;">
+Get a tailored briefing on your organization's attrition risk profile and discuss pilot deployment.
+</p>
+</div>""", unsafe_allow_html=True)
 
     with st.form("homepage_demo_form"):
         name = st.text_input("Full Name", placeholder="Sarah Jenkins")
@@ -2241,4 +2611,4 @@ with cont_right:
         submit = st.form_submit_button("Request Enterprise Access", type="primary")
 
         if submit:
-            st.toast("Inquiry registered! A RetainlyAI talent specialist will contact you shortly.", icon="✅")
+            st.toast("Inquiry registered! A RetAIn talent specialist will contact you shortly.", icon="✅")

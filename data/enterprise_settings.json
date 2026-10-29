@@ -1,0 +1,18 @@
+{
+  "client_name": "Apex Global Technologies",
+  "industry_vertical": "Enterprise Software & Cloud Services",
+  "workforce_scale": "51-200",
+  "exit_velocity_cap": 0.30,
+  "weight_sentiment": 0.40,
+  "weight_exit": 0.35,
+  "weight_stagnation": 0.25,
+  "risk_band_yellow": 40.0,
+  "risk_band_red": 70.0,
+  "stagnation_cap_months": 24.0,
+  "salary_base": 25000.0,
+  "salary_per_band": 25000.0,
+  "replacement_multiplier_junior": 0.75,
+  "replacement_multiplier_mid": 1.00,
+  "replacement_multiplier_senior": 1.50,
+  "calibration_note": "Defaults. Calibrate against the client's actual exits before relying on scores."
+}

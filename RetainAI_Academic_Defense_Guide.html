@@ -270,13 +270,16 @@
 
   <div class="formula-card">
     <div class="formula-title">Formula 2: Deterministic Composite Flight Risk Score (R_composite)</div>
-    <strong>R_composite = 100 × [ w_1 · E_norm + w_2 · (1 - S_norm) + w_3 · T_stag + w_4 · C_gap ]</strong><br><br>
-    <strong>Weights:</strong><br>
-    • <strong>w_1 = 0.35</strong> (Historical Exit Velocity: Exits_cohort / Total Headcount_cohort)<br>
-    • <strong>w_2 = 0.30</strong> (Survey Sentiment Inversion: 1 - (Mean Survey Score / 5.0))<br>
-    • <strong>w_3 = 0.20</strong> (Tenure Stagnation Index: min(1.0, Months Since Last Promotion / 24.0))<br>
-    • <strong>w_4 = 0.15</strong> (Compensation Compa-Ratio Deficit: Relative salary gap vs peer median)<br><br>
-    <strong>Thresholds:</strong> 🟢 Low Risk: &lt; 40.0 | 🟡 Watchlist: 40.0–69.9 | 🔴 Critical Threat: ≥ 70.0
+    <strong>R_composite = 100 × [ w_1 · (1 - ((Mean_Survey - 1) / 4.0)) + w_2 · min(1.0, E_velocity / E_cap) + w_3 · min(1.0, T_promo / T_cap) ]</strong><br><br>
+    <strong>Configurable Defaults:</strong><br>
+    • <strong>w_1 = 0.40</strong> (Survey Sentiment Inversion: 1 - ((Mean Survey Score - 1) / 4.0); survey scale is 1-5, so the worst mean (1) gives full risk)<br>
+    • <strong>w_2 = 0.35</strong> (Exit Term: min(1.0, Exit Velocity / exit_velocity_cap), where Exit Velocity = exits in trailing 12 months / active cohort headcount; default cap 0.30)<br>
+    • <strong>w_3 = 0.25</strong> (Tenure Stagnation Index: min(1.0, Months Since Last Promotion / 24.0); default cap 24 months)<br><br>
+    <strong>Thresholds & Risk Bands:</strong><br>
+    • 🟢 <strong>Low Risk:</strong> &lt; 40.0<br>
+    • 🟡 <strong>Early warning (sentiment / stagnation):</strong> 40.0–69.9<br>
+    • 🔴 <strong>Critical (adverse signals plus real departures):</strong> ≥ 70.0<br>
+    <em>* Note: With zero exits the maximum possible score is 65.0 (40 sentiment + 25 stagnation), so entering Red requires real departures.</em>
   </div>
 
   <div class="formula-card">
@@ -285,15 +288,17 @@
     <strong>Empirical Replacement Multipliers (μ_tier):</strong><br>
     • <strong>Junior / Operational:</strong> μ = 0.50 – 0.75 (Recruiting fees + basic onboarding)<br>
     • <strong>Mid-Level Professional / Sales:</strong> μ = 1.00 – 1.25 (Ramp-up latency + pipeline vacancy)<br>
-    • <strong>Senior Engineer / Tech Lead:</strong> μ = 1.50 – 2.00 (Loss of institutional knowledge, code velocity drop, headhunter rates)
+    • <strong>Senior Engineer / Tech Lead:</strong> μ = 1.50 – 2.00 (Loss of institutional knowledge, code velocity drop, headhunter rates)<br>
+    <em>Full empirical range across all job tiers: 0.50x – 2.00x.</em>
   </div>
 
   <div class="formula-card">
     <div class="formula-title">Formula 4: Longitudinal Intervention Net ROI & Prevented Churn</div>
-    <strong>Prevented Exits = Headcount_cohort × ( ΔR / 100 ) × P(Exit | Baseline)</strong><br>
+    <strong>Prevented Exits = max(0, Headcount_cohort × ( Adjusted_Drop / 100 ) × p_exit)</strong><br>
     <strong>Gross Financial Savings = Prevented Exits × Cost_replacement</strong><br>
     <strong>Net ROI (%) = [ ( Gross Financial Savings - Cost_intervention ) / Cost_intervention ] × 100</strong><br><br>
-    • <em>ΔR = R_before - R_after</em> (Observed risk reduction in follow-up telemetry).<br>
+    • <em>Adjusted Drop = (R_before_treated - R_current_treated) - (R_before_control - R_current_control)</em>.<br>
+    • <em>p_exit = the treated cohort's trailing-12-month exits / active headcount</em>.<br>
     • <em>Cost_intervention:</em> Verified intervention expenditure.
   </div>
 
@@ -318,7 +323,7 @@
       <tr>
         <td><strong>Intermediate Linkages Model</strong><br>Mobley, W. H. (1977)<br><em>Journal of Applied Psychology</em></td>
         <td>Turnover follows a cognitive path: <em>Dissatisfaction → Thoughts of Quitting → Utility Evaluation → Search Intentions → Resignation</em>.</td>
-        <td>RetainAI captures employees at stages 2 & 3 (Thoughts/Evaluation) 60-90 days prior to stage 5 (Notice served).</td>
+        <td>RetainAI captures friction at the early stages (Thoughts of Quitting / Utility Evaluation), before Job Search and formal resignation, when intervention is still possible.</td>
       </tr>
       <tr>
         <td><strong>Job Embeddedness Theory</strong><br>Mitchell et al. (2001)<br><em>Academy of Management Journal</em></td>
@@ -328,7 +333,7 @@
       <tr>
         <td><strong>Cost of Human Turnover Framework</strong><br>Cascio, W. F. (2000) & SHRM (2022)<br><em>Costing Human Resources</em></td>
         <td>Replacement cost extends beyond recruitment: encompasses separation pay, vacancy productivity loss, ramp-up lag, and team contagion.</td>
-        <td>Formula 3 integrates Cascio's 1.5x–2.0x multiplier for specialized knowledge workers into all intervention ROI models.</td>
+        <td>Formula 3 integrates Cascio's 0.50x–2.00x multiplier range (consistent with Section 3) into all intervention ROI models.</td>
       </tr>
       <tr>
         <td><strong>Social Desirability & Common Method Bias</strong><br>Podsakoff et al. (2012)<br><em>Annual Review of Psychology</em></td>
@@ -338,10 +343,21 @@
       <tr>
         <td><strong>Expectancy Theory of Motivation</strong><br>Vroom, V. H. (1964)<br><em>Work and Motivation</em></td>
         <td>Effort depends on believing high performance leads to rewards (Instrumentality). Promotion stalls break this cognitive link.</td>
-        <td>Tenure Stagnation Index (Formula 2) heavily weights employees exceeding 18-24 months in band without progression.</td>
+        <td>Tenure Stagnation Index (Formula 2) heavily weights employees reaching full penalty at 24 months (configurable).</td>
       </tr>
     </tbody>
   </table>
+
+  <h2>Privacy and anti-differencing safeguards</h2>
+  <p>
+    RetainAI implements rigorous privacy-preserving data safeguards designed in accordance with the Digital Personal Data Protection Act (DPDP Act 2023):
+  </p>
+  <ul>
+    <li><strong>No Individual Scoring:</strong> Never scores or reports on individuals; all analytics are strictly aggregated at cohort level.</li>
+    <li><strong>k-Anonymity on Responses (k ≥ 5):</strong> Enforced strictly on survey responses, not nominal headcount. Cohorts under 5 responses are automatically rolled up to parent department aggregates.</li>
+    <li><strong>Anti-Differencing Safeguards:</strong> Borderline cohorts (5 ≤ n &lt; 10 responses) display qualitative risk bands (Green/Yellow/Red) rather than exact numbers. Complementary suppression breaks algebraic determinism.</li>
+    <li><strong>Cadence Protection:</strong> Updates occur on scheduled quarterly cycles to prevent deducing departing individuals from day-to-day roster shifts.</li>
+  </ul>
 
   <h2>5. Academic Cross-Examination & Defense Strategies</h2>
 
@@ -352,7 +368,7 @@
 
   <div class="qa-block">
     <div class="qa-q">Q2: "Does passive tracking and predictive risk scoring violate employee privacy or create a toxic surveillance culture?"</div>
-    <div class="qa-a"><strong>Defensive Answer:</strong> "Our architecture adheres to strict Differential Privacy principles. The system enforces an aggregate cohort floor of n ≥ 5. Individual risk scores are never computed, displayed, or logged. The platform evaluates organizational segments (e.g., 'Junior Engineering' or 'Mid-level Sales'), identifying structural managerial and leveling debt rather than monitoring individual keystrokes or private communications."</div>
+    <div class="qa-a"><strong>Defensive Answer:</strong> "Our architecture adheres to strict privacy and anti-differencing safeguards and k-anonymity principles. The platform never scores or reports on individuals; all outputs are aggregated at cohort level with a minimum of 5 responses. Individual-level text (exit notes, retros) is processed only to extract thematic clusters and is not accessible to managers. If a cohort has fewer than 5 survey responses, it is automatically merged upward into its parent department aggregate to eliminate individual exposure. For borderline cohorts (5 ≤ n &lt; 10 responses), scores are displayed in qualitative color bands rather than exact 2-decimal numbers, and scores update on a scheduled quarterly cadence to mathematically eliminate leaver inference differencing attacks."</div>
   </div>
 
   <div class="qa-block">

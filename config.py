@@ -1,7 +1,7 @@
 import streamlit as st
 
 # App Constants
-APP_TITLE = "RetainlyAI | Predictive Talent Intelligence"
+APP_TITLE = "RetAIn | Predictive Talent Intelligence"
 APP_ICON = "✦"
 
 # Color Palette (NEONE Aesthetic: Deep Cosmic Obsidian & Electric Cyan)

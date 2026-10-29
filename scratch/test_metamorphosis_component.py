@@ -1,0 +1,996 @@
+# Scratch script to assemble and validate the background metamorphosis component
+import os
+
+html_template = """<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #030712;
+    color: #F8FAFC;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    user-select: none;
+  }
+
+  /* ==========================================================================
+     LAYER 1: TRADITIONAL HR EXCEL LOOP STYLES
+     ========================================================================== */
+  :root {
+    --sheet-bg: #050b18;
+    --cell-color: #9fb6d9;
+    --line-color: #12243f;
+    --red-alert: 255, 59, 70;
+  }
+  .excel-stage {
+    position: absolute;
+    inset: -60px;
+    perspective: 1200px;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .excel-sheet {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 3600px;
+    transform: translate(-50%, -50%) rotateX(15deg) rotateZ(-3deg) scale(1.22);
+    font: 13px/1 "SF Mono", Menlo, Consolas, monospace;
+    color: var(--cell-color);
+    animation: excelPan 48s ease-in-out infinite alternate;
+  }
+  @keyframes excelPan {
+    from { translate: 0 0; }
+    to { translate: -1100px 0; }
+  }
+  .excel-track {
+    animation: excelScroll 32s linear infinite;
+    will-change: transform;
+  }
+  @keyframes excelScroll {
+    to { transform: translateY(var(--loop, -1360px)); }
+  }
+  .excel-row {
+    display: grid;
+    grid-template-columns: 80px 100px 170px 140px 150px 150px 90px 80px 110px 140px 560px 100px 140px 100px 120px;
+    height: 34px;
+    align-items: center;
+    border-bottom: 1px solid var(--line-color);
+    position: relative;
+    white-space: nowrap;
+  }
+  .excel-row span {
+    padding: 0 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border-right: 1px solid var(--line-color);
+    height: 100%;
+    display: flex;
+    align-items: center;
+  }
+  .excel-row span:first-child { color: #4a6694; }
+  .excel-row .err { color: #ff8f98; }
+  .excel-row .dim { color: #4a6694; }
+  .excel-row .hl { background: rgba(255, 214, 10, 0.12); }
+  .excel-row .bl { background: rgba(60, 130, 255, 0.14); }
+  .excel-row.risk::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(var(--red-alert), 0.28);
+    box-shadow: inset 0 0 0 1px rgba(var(--red-alert), 0.65), 0 0 28px rgba(var(--red-alert), 0.45);
+    opacity: 0;
+    animation: excelFlash 4.2s ease-in-out infinite;
+    animation-delay: var(--d, 0s);
+  }
+  @keyframes excelFlash {
+    0%, 100% { opacity: 0; }
+    12%, 30% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+  .excel-dof {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    backdrop-filter: blur(2.5px);
+    -webkit-mask-image: linear-gradient(#000 0, #000 12%, transparent 32%, transparent 68%, #000 88%, #000 100%);
+    mask-image: linear-gradient(#000 0, #000 12%, transparent 32%, transparent 68%, #000 88%, #000 100%);
+  }
+  .excel-light {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(75% 60% at 30% 40%, rgba(40, 90, 200, 0.22), transparent 75%),
+                radial-gradient(130% 105% at 50% 50%, rgba(3, 7, 18, 0.45) 15%, rgba(3, 7, 18, 0.95) 100%);
+  }
+  .excel-scan {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(0deg, rgba(255,255,255,0.012) 0 1px, transparent 1px 3px);
+    mix-blend-mode: screen;
+  }
+
+  /* Typewriter Blinking Cursor */
+  .typewriter-cursor {
+    display: inline-block;
+    width: 3px;
+    height: 1.15em;
+    background-color: #38BDF8;
+    margin-left: 5px;
+    vertical-align: middle;
+    animation: cursorBlink 0.8s infinite;
+  }
+  @keyframes cursorBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  /* ==========================================================================
+     LAYER 2: WORKFORCE PULSE DASHBOARD LOOP STYLES
+     ========================================================================== */
+  .wp-app {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-rows: auto auto 1fr;
+    gap: 10px;
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 14px 20px;
+    pointer-events: none;
+    box-sizing: border-box;
+  }
+  .wp-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .wp-title {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    color: #cfe0ff;
+  }
+  .wp-live {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: #7f97bd;
+    font-family: monospace;
+  }
+  .wp-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #2ee6a6;
+    box-shadow: 0 0 10px #2ee6a6;
+    animation: wpPulse 1.6s infinite;
+  }
+  @keyframes wpPulse { 50% { opacity: 0.35; } }
+  .wp-kpis {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+  .wp-card {
+    background: rgba(12, 28, 52, 0.65);
+    border: 1px solid rgba(120, 170, 255, 0.16);
+    border-radius: 12px;
+    padding: 10px 14px;
+    backdrop-filter: blur(8px);
+    position: relative;
+  }
+  .wp-card small {
+    color: #7f97bd;
+    font-size: 11px;
+    display: block;
+  }
+  .wp-card b {
+    display: block;
+    font-size: 22px;
+    font-weight: 700;
+    margin-top: 2px;
+    color: #dce9ff;
+    font-variant-numeric: tabular-nums;
+  }
+  .wp-card i {
+    font-style: normal;
+    font-size: 11px;
+  }
+  .wp-main {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    grid-template-rows: 1.25fr 1fr;
+    gap: 10px;
+    min-height: 0;
+  }
+  .wp-main .wp-card {
+    display: flex;
+    flex-direction: column;
+  }
+  .wp-t {
+    font-size: 11px;
+    color: #7f97bd;
+    margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .wp-leg span { margin-left: 10px; }
+  .wp-leg em {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    margin-right: 4px;
+  }
+  .wp-canvas {
+    width: 100%;
+    flex: 1;
+    min-height: 0;
+    display: block;
+  }
+  .wp-line { grid-row: 1; }
+  .wp-heat { grid-column: 2; grid-row: 1 / 3; }
+  .wp-ai { grid-row: 2; }
+  #wp-hm {
+    display: grid;
+    gap: 3px;
+    flex: 1;
+    min-height: 0;
+    grid-template-columns: 85px repeat(10, 1fr);
+    align-items: stretch;
+  }
+  #wp-hm .l {
+    font-size: 10px;
+    color: #7f97bd;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-right: 4px;
+  }
+  #wp-hm .c {
+    border-radius: 3px;
+    min-height: 10px;
+  }
+  .wp-scale {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10px;
+    color: #7f97bd;
+    margin-top: 6px;
+  }
+  .wp-scale div {
+    flex: 1;
+    height: 4px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, #2ee6a6, #ffb84a, #ff5a6e);
+  }
+
+  /* Frosted Glass Bento Capability Card */
+  .bento-card-interactive {
+    background: rgba(11, 17, 32, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(56, 189, 248, 0.22);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.55);
+    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .bento-card-interactive:hover {
+    border-color: rgba(56, 189, 248, 0.65);
+    box-shadow: 0 12px 40px rgba(56, 189, 248, 0.16), inset 0 0 20px rgba(56, 189, 248, 0.08);
+    transform: translateY(-2px);
+  }
+</style>
+</head>
+<body class="bg-[#030712] w-full h-full overflow-hidden m-0 p-0">
+  <div id="transition-root" class="w-full h-full m-0 p-0 overflow-hidden"></div>
+
+  <script>
+    const { useState, useEffect, useRef } = React;
+
+    // SPREADSHEET ROW GENERATOR
+    function generateSpreadsheetRows() {
+      let s = 11;
+      const r = () => (s = (s * 16807) % 2147483647) / 2147483647;
+      const pick = a => a[Math.floor(r() * a.length)];
+      const names = ["A. Rao","M. Chen","S. Okafor","L. Meyer","P. Iyer","J. Silva","K. Tanaka","D. Novak","R. Haddad","E. Brooks","N. Kapoor","T. Larsen","Priya S.","chen, wei"];
+      const depts = ["Engineering","Sales","Support","Finance","Product","Ops","People","Cust. Success"];
+      const roles = ["Analyst","Sr. Engineer","Manager","Lead","Associate","Director","Sr Eng II","Acct Exec"];
+      const mgrs = ["R. Mehta","B. Alvarez","#N/A","C. Ford","H. Lindqvist","(blank)","V. Rao","Unknown"];
+      const reasons = ["Better offer","Career growth","Manager","Burnout","Comp","Relocation","Other","Personal"];
+      const status = ["Filed","Pending","Unread","Unread","Filed","Review?","Unread","Closed"];
+      const notes = [
+        "Role matched expectations; happy with team",
+        "Growth path unclear after reorg, no promo in 3 yrs",
+        "Workload unsustainable for 3 quarters, asked for help twice",
+        "Manager rarely gave feedback; skip-level never happened",
+        "Compensation below market, counter-offer came too late",
+        "Strong peers but limited promotion; 2 teammates also leaving",
+        "Remote policy changed without notice",
+        "Burned out, no backfill since March",
+        "Accepted offer, 40% increase",
+        "Praised onboarding, left for relocation"
+      ];
+      const risky = new Set([1, 2, 3, 4, 5, 6, 7]);
+      const dt = () => {
+        const d = 1 + Math.floor(r() * 28), m = 1 + Math.floor(r() * 12), y = pick([2024, 2025]);
+        return `${d}/${m}/${y}`;
+      };
+      const N = 40;
+      let rowsHtml = "";
+      for (let i = 0; i < N; i++) {
+        const n = Math.floor(r() * notes.length);
+        const st = pick(status);
+        const risk = risky.has(n) && st !== "Filed" && st !== "Closed" && r() > 0.3;
+        const mg = pick(mgrs);
+        const rt = r() > 0.85 ? "#REF!" : (1 + r() * 4).toFixed(1);
+        const cd = r() > 0.8 ? "" : (r() > 0.5 ? "+" : "-") + Math.floor(r() * 30) + "%";
+        rowsHtml += `
+          <div class="excel-row ${risk ? "risk" : ""}" style="--d: ${(r() * 4.2).toFixed(2)}s">
+            <span>${1000 + i}</span>
+            <span>E${20000 + Math.floor(r() * 9999)}</span>
+            <span>${pick(names)}</span>
+            <span>${pick(depts)}</span>
+            <span>${pick(roles)}</span>
+            <span class="${mg[0] === "#" || mg[0] === "(" ? "err" : ""}">${mg}</span>
+            <span>${(1 + r() * 9).toFixed(1)}y</span>
+            <span class="${rt[0] === "#" ? "err" : ""}">${rt}</span>
+            <span>${dt()}</span>
+            <span class="${r() > 0.8 ? "hl" : ""}">${pick(reasons)}</span>
+            <span>${notes[n]}</span>
+            <span class="${st === "Unread" ? "err" : "dim"}">${st}</span>
+            <span class="${r() > 0.7 ? "bl" : ""}">${cd || ""}</span>
+            <span class="dim">${r() > 0.5 ? "Q" + (1 + Math.floor(r() * 4)) : ""}</span>
+            <span class="${r() > 0.85 ? "err" : "dim"}">${r() > 0.85 ? "#VALUE!" : pick(["", "v2", "FINAL", "copy"])}</span>
+          </div>`;
+      }
+      return { html: rowsHtml + rowsHtml, height: N * 34 };
+    }
+
+    // MAIN TRANSITION COMPONENT
+    function TransitionComponent() {
+      const [progress, setProgress] = useState(0); // 0 = Traditional HR Excel, 1 = RetAIn Platform
+
+      // Simultaneous Typewriter Effect
+      const fullText = "Billions lost to silent resignations, buried in endless spreadsheets.";
+      const [typedText, setTypedText] = useState("");
+      const isTypingActiveRef = useRef(false);
+
+      const triggerTypewriter = () => {
+        if (isTypingActiveRef.current) return;
+        isTypingActiveRef.current = true;
+        setTypedText("");
+        let idx = 0;
+        if (window._typewriterTimer) clearInterval(window._typewriterTimer);
+        window._typewriterTimer = setInterval(() => {
+          if (idx <= fullText.length) {
+            setTypedText(fullText.slice(0, idx));
+            idx++;
+          } else {
+            clearInterval(window._typewriterTimer);
+          }
+        }, 36);
+      };
+
+      // Populate Spreadsheet Rows on Mount
+      useEffect(() => {
+        const track = document.getElementById("excel-track-fullscreen");
+        if (track) {
+          const { html, height } = generateSpreadsheetRows();
+          track.innerHTML = html;
+          track.style.setProperty("--loop", `-${height}px`);
+        }
+      }, []);
+
+      // Mount Workforce Pulse Dashboard Loop Canvas Engine
+      useEffect(() => {
+        const ln = document.getElementById('wp-ln');
+        const ai = document.getElementById('wp-ai');
+        const hm = document.getElementById('wp-hm');
+        if (!ln || !ai || !hm) return;
+
+        const lx = ln.getContext('2d');
+        const ax = ai.getContext('2d');
+        const TAU = Math.PI * 2;
+        const T = 16;
+        const depts = ['Engineering','Sales','Support','Finance','Product','Marketing','Operations','Legal'];
+        const COLS = 10;
+        const cells = [];
+
+        hm.innerHTML = '';
+        depts.forEach((d, i) => {
+          const l = document.createElement('div');
+          l.className = 'l';
+          l.innerHTML = `<span>${d}</span><b style="font-weight:500;color:#cfe0ff" id="wp-r${i}"></b>`;
+          hm.appendChild(l);
+          cells[i] = [];
+          for (let j = 0; j < COLS; j++) {
+            const c = document.createElement('div');
+            c.className = 'c';
+            hm.appendChild(c);
+            cells[i][j] = c;
+          }
+        });
+        hm.style.gridTemplateRows = `repeat(${depts.length}, 1fr)`;
+
+        function heatCol(v) {
+          const g = [46, 230, 166], a = [255, 184, 74], r = [255, 90, 110];
+          const [p, q, f] = v < 0.5 ? [g, a, v * 2] : [a, r, (v - 0.5) * 2];
+          return p.map((x, i) => Math.round(x + (q[i] - x) * f));
+        }
+
+        let LD = 1, AD = 1;
+        function sz(cv) {
+          const D = Math.min(window.devicePixelRatio || 1, 2);
+          const b = cv.getBoundingClientRect();
+          cv.width = b.width * D;
+          cv.height = b.height * D;
+          return D;
+        }
+        function rs() {
+          if (ln && ai) {
+            LD = sz(ln);
+            AD = sz(ai);
+          }
+        }
+        window.addEventListener('resize', rs);
+        rs();
+
+        const sig = [
+          (x, u) => 0.55 + 0.16 * Math.sin(TAU * (x * 1.3 + u * 1)) + 0.07 * Math.sin(TAU * (x * 3.1 + u * 2)),
+          (x, u) => 0.68 + 0.12 * Math.sin(TAU * (x * 1.9 + u * 1 + 0.2)) + 0.06 * Math.sin(TAU * (x * 4 + u * 3)),
+          (x, u) => 0.42 + 0.17 * Math.sin(TAU * (x * 1.1 + u * 1 + 0.6)) + 0.05 * Math.sin(TAU * (x * 3.7 + u * 2))
+        ];
+        const cols = ['61,139,255', '46,230,166', '255,184,74'];
+
+        function drawLine(u) {
+          const w = ln.width, h = ln.height, D = LD, pl = 34 * D, pb = 18 * D, pt = 6 * D;
+          lx.clearRect(0, 0, w, h);
+          lx.font = `${10 * D}px system-ui`;
+          lx.fillStyle = '#6f87ad';
+          lx.strokeStyle = 'rgba(120,170,255,.1)';
+          lx.lineWidth = D;
+          for (let i = 0; i <= 4; i++) {
+            const y = pt + (h - pt - pb) * i / 4;
+            lx.beginPath(); lx.moveTo(pl, y); lx.lineTo(w, y); lx.stroke();
+            lx.fillText(100 - i * 20, 2 * D, y + 3 * D);
+          }
+          sig.forEach((f, k) => {
+            const pts = [];
+            for (let i = 0; i <= 120; i++) {
+              const s = i / 120;
+              pts.push([pl + s * (w - pl), pt + (h - pt - pb) * (1 - f(s, u))]);
+            }
+            const path = () => {
+              lx.beginPath();
+              pts.forEach((p, i) => i ? lx.lineTo(p[0], p[1]) : lx.moveTo(p[0], p[1]));
+            };
+            if (k === 0) {
+              path();
+              lx.lineTo(w, h - pb);
+              lx.lineTo(pl, h - pb);
+              const g = lx.createLinearGradient(0, pt, 0, h);
+              g.addColorStop(0, 'rgba(61,139,255,.26)');
+              g.addColorStop(1, 'rgba(61,139,255,0)');
+              lx.fillStyle = g;
+              lx.fill();
+            }
+            lx.lineJoin = 'round';
+            lx.lineCap = 'round';
+            lx.shadowColor = `rgb(${cols[k]})`;
+            lx.shadowBlur = 14 * D;
+            lx.strokeStyle = `rgba(${cols[k]},${k ? 0.8 : 1})`;
+            lx.lineWidth = (k ? 1.6 : 2.4) * D;
+            path();
+            lx.stroke();
+            lx.shadowBlur = 0;
+            const e = pts[pts.length - 1], pu = 0.5 + 0.5 * Math.sin(TAU * u * 4);
+            const gr = lx.createRadialGradient(e[0], e[1], 0, e[0], e[1], (8 + 6 * pu) * D);
+            gr.addColorStop(0, `rgba(${cols[k]},.9)`);
+            gr.addColorStop(1, `rgba(${cols[k]},0)`);
+            lx.fillStyle = gr;
+            lx.beginPath();
+            lx.arc(e[0], e[1], (8 + 6 * pu) * D, 0, TAU);
+            lx.fill();
+          });
+          const cx = pl + (w - pl) * ((u * 2) % 1);
+          lx.strokeStyle = 'rgba(46,230,166,.25)';
+          lx.lineWidth = D;
+          lx.beginPath();
+          lx.moveTo(cx, pt);
+          lx.lineTo(cx, h - pb);
+          lx.stroke();
+        }
+
+        const L = [3, 5, 4, 2], NP = [];
+        function layout(w, h) {
+          NP.length = 0;
+          L.forEach((n, i) => {
+            const col = [];
+            for (let j = 0; j < n; j++) {
+              col.push([w * (0.1 + 0.8 * i / (L.length - 1)), h * (0.15 + 0.7 * (n === 1 ? 0.5 : j / (n - 1)))]);
+            }
+            NP.push(col);
+          });
+        }
+
+        function drawAI(u) {
+          const w = ai.width, h = ai.height, D = AD;
+          layout(w, h);
+          ax.clearRect(0, 0, w, h);
+          for (let i = 0; i < L.length - 1; i++) {
+            NP[i].forEach((a, j) => NP[i + 1].forEach((b, m) => {
+              const o = ((j * 7 + m * 3 + i * 5) % 10) / 10;
+              const g = i / (L.length - 2);
+              ax.strokeStyle = `rgba(${g > 0.5 ? '46,230,166' : '61,139,255'},.14)`;
+              ax.lineWidth = D;
+              ax.beginPath();
+              ax.moveTo(a[0], a[1]);
+              ax.lineTo(b[0], b[1]);
+              ax.stroke();
+              const p = (u * 2 + o) % 1, f = Math.sin(p * Math.PI);
+              if ((j + m + i) % 2 === 0) {
+                const x = a[0] + (b[0] - a[0]) * p, y = a[1] + (b[1] - a[1]) * p;
+                const gr = ax.createRadialGradient(x, y, 0, x, y, 9 * D);
+                const c = g > 0.5 ? '46,230,166' : '61,139,255';
+                gr.addColorStop(0, `rgba(${c},${0.9 * f})`);
+                gr.addColorStop(1, `rgba(${c},0)`);
+                ax.fillStyle = gr;
+                ax.beginPath();
+                ax.arc(x, y, 9 * D, 0, TAU);
+                ax.fill();
+              }
+            }));
+          }
+          NP.forEach((col, i) => col.forEach((p, j) => {
+            const a = 0.5 + 0.5 * Math.sin(TAU * (u * 2 - i * 0.18 + j * 0.07)), c = i > 2 ? '46,230,166' : '61,139,255';
+            const gl = ax.createRadialGradient(p[0], p[1], 0, p[0], p[1], 16 * D);
+            gl.addColorStop(0, `rgba(${c},${0.15 + 0.4 * a})`);
+            gl.addColorStop(1, `rgba(${c},0)`);
+            ax.fillStyle = gl;
+            ax.beginPath();
+            ax.arc(p[0], p[1], 16 * D, 0, TAU);
+            ax.fill();
+            ax.fillStyle = `rgb(${c})`;
+            ax.beginPath();
+            ax.arc(p[0], p[1], 3.5 * D, 0, TAU);
+            ax.fill();
+          }));
+        }
+
+        function drawHeat(u) {
+          depts.forEach((d, i) => {
+            let s = 0;
+            for (let j = 0; j < COLS; j++) {
+              const base = [0.35, 0.5, 0.62, 0.3, 0.45, 0.4, 0.55, 0.25][i];
+              const v = Math.min(1, Math.max(0, base + 0.34 * Math.sin(TAU * (u * 1 + i * 0.11 + j * 0.06)) + 0.12 * Math.sin(TAU * (u * 2 - j * 0.13 + i * 0.3))));
+              const [r, g, b] = heatCol(v);
+              cells[i][j].style.background = `rgba(${r},${g},${b},${0.35 + 0.5 * v})`;
+              cells[i][j].style.boxShadow = v > 0.72 ? `0 0 10px rgba(${r},${g},${b},.55)` : 'none';
+              s += v;
+            }
+            const avg = s / COLS;
+            const rEl = document.getElementById(`wp-r${i}`);
+            if (rEl) rEl.textContent = Math.round(avg * 100);
+          });
+        }
+
+        function drawKpi(u) {
+          const w = x => 0.5 + 0.5 * Math.sin(TAU * (u + x));
+          const k1 = document.getElementById('wp-k1');
+          const d1 = document.getElementById('wp-d1');
+          if (k1) k1.textContent = (72 + 8 * w(0)).toFixed(1);
+          if (d1) d1.innerHTML = `<span style="color:#2ee6a6">▲ ${(1 + 2 * w(0.1)).toFixed(1)}</span> <span style="color:#7f97bd">vs last week</span>`;
+          const n = Math.round(2 + 4 * w(0.3));
+          const k2 = document.getElementById('wp-k2');
+          const d2 = document.getElementById('wp-d2');
+          if (k2) k2.textContent = n;
+          if (d2) d2.innerHTML = `<span style="color:${n > 4 ? '#ff5a6e' : '#ffb84a'}">${n > 4 ? 'Needs attention' : 'Monitoring'}</span>`;
+          const k3 = document.getElementById('wp-k3');
+          const d3 = document.getElementById('wp-d3');
+          if (k3) k3.textContent = Math.round(64 + 10 * w(0.55)) + '%';
+          if (d3) d3.innerHTML = `<span style="color:#3d8bff">Surveys, chat, 1:1s</span>`;
+          const k4 = document.getElementById('wp-k4');
+          const d4 = document.getElementById('wp-d4');
+          if (k4) k4.textContent = (6 + 2.5 * w(0.8)).toFixed(1) + '%';
+          if (d4) d4.innerHTML = `<span style="color:#7f97bd">Next 90 days</span>`;
+        }
+
+        let loopRaf;
+        function loop(now) {
+          const u = ((now / 1000) % T) / T;
+          drawLine(u);
+          drawAI(u);
+          drawHeat(u);
+          drawKpi(u);
+          loopRaf = requestAnimationFrame(loop);
+        }
+        loopRaf = requestAnimationFrame(loop);
+
+        return () => {
+          window.removeEventListener('resize', rs);
+          cancelAnimationFrame(loopRaf);
+        };
+      }, []);
+
+      // Scroll physics with Calibrated Timing Balance
+      useEffect(() => {
+        let parentWin, parentDoc, scroller;
+        try {
+          parentDoc = window.parent.document;
+          parentWin = window.parent;
+          scroller = parentDoc.querySelector('section.stMain') || 
+                     parentDoc.querySelector('[data-testid="stMain"]') || 
+                     parentDoc.querySelector('[data-testid="stAppViewContainer"]') || 
+                     parentWin;
+        } catch (e) {
+          scroller = window;
+          parentWin = window;
+        }
+
+        let targetP = 0;
+        let currentP = 0;
+        let rafId;
+
+        const checkInViewAndScroll = () => {
+          try {
+            const frame = window.frameElement;
+            if (!frame) return;
+            const rect = frame.getBoundingClientRect();
+            const winH = parentWin.innerHeight || window.innerHeight;
+
+            // Trigger typewriter effect as section approaches viewport
+            if (rect.top < winH * 0.95 && rect.bottom > 80) {
+              triggerTypewriter();
+            }
+
+            // CALIBRATED SCROLL TIMING:
+            // When rect.top >= 290px: user comfortably views the Excel sheet + live typewriter subtitle (progress = 0)
+            // When rect.top moves from 290px down to 70px: smooth background metamorphosis & Bento emergence
+            // When rect.top <= 70px: settled state (progress = 1.0).
+            // Height is 590px, so 70px + 590px = 660px, fits 100% inside monitor with ALL 4 Bento cards completely visible!
+            const startY = 290;
+            const endY = 70;
+            const raw = (startY - rect.top) / (startY - endY);
+            targetP = Math.max(0, Math.min(1, raw));
+          } catch (err) {}
+        };
+
+        const tick = () => {
+          currentP += (targetP - currentP) * 0.1;
+          if (Math.abs(targetP - currentP) < 0.001) {
+            currentP = targetP;
+          }
+          setProgress(currentP);
+          rafId = requestAnimationFrame(tick);
+        };
+
+        const targetEl = (scroller && scroller.addEventListener) ? scroller : parentWin;
+        if (targetEl && targetEl.addEventListener) {
+          targetEl.addEventListener('scroll', checkInViewAndScroll, { passive: true });
+        }
+        window.addEventListener('resize', checkInViewAndScroll);
+        checkInViewAndScroll();
+        rafId = requestAnimationFrame(tick);
+
+        return () => {
+          if (targetEl && targetEl.removeEventListener) {
+            targetEl.removeEventListener('scroll', checkInViewAndScroll);
+          }
+          window.removeEventListener('resize', checkInViewAndScroll);
+          cancelAnimationFrame(rafId);
+        };
+      }, []);
+
+      // Dynamic Metamorphosis Opacities & Transforms
+      // Excel layer fades out
+      const excelOpacity = Math.max(0, 1 - progress * 1.6);
+      const excelBlur = progress * 6;
+
+      // Text 1 (Traditional HR Headline + Typewriter) fades & floats slightly upward
+      const text1Opacity = Math.max(0, 1 - progress * 2.2);
+      const text1Y = -progress * 30;
+
+      // Layer 2: Workforce Pulse Dashboard Loop fades in
+      const pulseOpacity = Math.min(1, progress * 1.4);
+
+      // Layer 3: RetAIn Platform + 4 Bento Cards
+      const bentoProgress = Math.min(1, Math.max(0, (progress - 0.18) / 0.82));
+      const bentoOpacity = bentoProgress;
+      const bentoY = (1 - bentoProgress) * 25;
+      const bentoScale = 0.97 + bentoProgress * 0.03;
+
+      return React.createElement('div', {
+        className: 'relative w-full h-[590px] overflow-hidden bg-[#030712] border-y border-slate-800/80 shadow-[0_20px_50px_rgba(0,0,0,0.9)]'
+      },
+        // ====================================================================
+        // BACKGROUND LAYER 1: 100% FULL-SCREEN 3D EXCEL SPREADSHEET LOOP
+        // ====================================================================
+        React.createElement('div', {
+          className: 'absolute inset-0 w-full h-full pointer-events-none will-change-transform',
+          style: {
+            opacity: excelOpacity,
+            filter: `blur(${excelBlur}px)`,
+            display: excelOpacity <= 0 ? 'none' : 'block'
+          }
+        },
+          React.createElement('div', { className: 'excel-stage' },
+            React.createElement('div', { className: 'excel-sheet' },
+              React.createElement('div', { id: 'excel-track-fullscreen', className: 'excel-track' })
+            )
+          ),
+          React.createElement('div', { className: 'excel-dof' }),
+          React.createElement('div', { className: 'excel-light' }),
+          React.createElement('div', { className: 'excel-scan' })
+        ),
+
+        // ====================================================================
+        // BACKGROUND LAYER 2: WORKFORCE PULSE DASHBOARD LOOP (LIVE CANVAS ENGINE)
+        // ====================================================================
+        React.createElement('div', {
+          className: 'absolute inset-0 w-full h-full pointer-events-none will-change-transform',
+          style: {
+            opacity: pulseOpacity,
+            display: pulseOpacity <= 0 ? 'none' : 'block'
+          }
+        },
+          // Workforce Pulse DOM Structure
+          React.createElement('div', { className: 'wp-app' },
+            React.createElement('header', { className: 'wp-header' },
+              React.createElement('h1', { className: 'wp-title' }, 'Workforce Pulse'),
+              React.createElement('div', { className: 'wp-live' },
+                React.createElement('span', { className: 'wp-dot' }),
+                'Live · processing 48,210 signals'
+              )
+            ),
+            React.createElement('section', { className: 'wp-kpis' },
+              React.createElement('div', { className: 'wp-card' },
+                React.createElement('small', null, 'Sentiment index'),
+                React.createElement('b', { id: 'wp-k1' }, '72.4'),
+                React.createElement('i', { id: 'wp-d1' })
+              ),
+              React.createElement('div', { className: 'wp-card' },
+                React.createElement('small', null, 'Teams at risk'),
+                React.createElement('b', { id: 'wp-k2' }, '3'),
+                React.createElement('i', { id: 'wp-d2' })
+              ),
+              React.createElement('div', { className: 'wp-card' },
+                React.createElement('small', null, 'Engagement'),
+                React.createElement('b', { id: 'wp-k3' }, '68%'),
+                React.createElement('i', { id: 'wp-d3' })
+              ),
+              React.createElement('div', { className: 'wp-card' },
+                React.createElement('small', null, 'Attrition forecast'),
+                React.createElement('b', { id: 'wp-k4' }, '7.1%'),
+                React.createElement('i', { id: 'wp-d4' })
+              )
+            ),
+            React.createElement('section', { className: 'wp-main' },
+              React.createElement('div', { className: 'wp-card wp-line' },
+                React.createElement('div', { className: 'wp-t' },
+                  React.createElement('span', null, 'Sentiment trend'),
+                  React.createElement('span', { className: 'wp-leg' },
+                    React.createElement('span', null, React.createElement('em', { style: { background: '#3d8bff' } }), 'Company'),
+                    React.createElement('span', null, React.createElement('em', { style: { background: '#2ee6a6' } }), 'Engineering'),
+                    React.createElement('span', null, React.createElement('em', { style: { background: '#ffb84a' } }), 'Support')
+                  )
+                ),
+                React.createElement('canvas', { id: 'wp-ln', className: 'wp-canvas' })
+              ),
+              React.createElement('div', { className: 'wp-card wp-heat' },
+                React.createElement('div', { className: 'wp-t' },
+                  React.createElement('span', null, 'Department risk'),
+                  React.createElement('span', null, 'last 10 weeks')
+                ),
+                React.createElement('div', { id: 'wp-hm' }),
+                React.createElement('div', { className: 'wp-scale' },
+                  'Low',
+                  React.createElement('div', null),
+                  'High'
+                )
+              ),
+              React.createElement('div', { className: 'wp-card wp-ai' },
+                React.createElement('div', { className: 'wp-t' },
+                  React.createElement('span', null, 'Signal processing'),
+                  React.createElement('span', null, 'Surveys · Chat · HRIS')
+                ),
+                React.createElement('canvas', { id: 'wp-ai', className: 'wp-canvas' })
+              )
+            )
+          ),
+          // Dark moody overlay so Bento cards have 100% legibility while live ambient waves glow through
+          React.createElement('div', {
+            className: 'absolute inset-0 w-full h-full pointer-events-none',
+            style: {
+              background: 'radial-gradient(ellipse at 50% 50%, rgba(3, 7, 18, 0.72) 0%, rgba(3, 7, 18, 0.92) 100%)',
+              backdropFilter: 'blur(1.5px)'
+            }
+          })
+        ),
+
+        // ====================================================================
+        // FOREGROUND 1: TRADITIONAL HR HEADLINE + ACTIVE TYPEWRITER SUBTITLE
+        // ====================================================================
+        React.createElement('div', {
+          className: 'absolute inset-0 z-20 w-full h-full flex flex-col justify-center items-center text-center px-6 pointer-events-none will-change-transform',
+          style: {
+            opacity: text1Opacity,
+            transform: `translateY(${text1Y}px)`,
+            display: text1Opacity <= 0 ? 'none' : 'flex'
+          }
+        },
+          // Top Badge
+          React.createElement('div', {
+            className: 'inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold tracking-wider uppercase border border-sky-400/35 bg-sky-400/10 text-sky-400 shadow-[0_0_20px_rgba(56,189,248,0.25)] mb-4'
+          }, '✦ The Strategic Advantage'),
+
+          // Hero Headline on Top + Active Simultaneous Typewriter Subtitle
+          React.createElement('div', { className: 'max-w-4xl' },
+            React.createElement('h2', {
+              className: 'text-3xl md:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight mb-4 drop-shadow-[0_4px_16px_rgba(0,0,0,0.95)]'
+            }, 'Why Traditional HR Systems Fail'),
+            React.createElement('div', {
+              className: 'text-slate-200 text-lg md:text-2xl font-medium tracking-wide min-h-[44px] flex items-center justify-center drop-shadow-[0_2px_8px_rgba(0,0,0,0.95)]'
+            },
+              typedText,
+              React.createElement('span', { className: 'typewriter-cursor' })
+            )
+          )
+        ),
+
+        // ====================================================================
+        // FOREGROUND 2: RETAIN PLATFORM + 4 SEPARATELY PLACED BENTO CARDS
+        // ====================================================================
+        React.createElement('div', {
+          className: 'absolute inset-0 z-20 w-full h-full flex flex-col justify-between p-6 md:p-8 will-change-transform',
+          style: {
+            opacity: bentoOpacity,
+            transform: `translateY(${bentoY}px) scale(${bentoScale})`,
+            pointerEvents: bentoProgress < 0.5 ? 'none' : 'auto',
+            display: bentoOpacity <= 0 ? 'none' : 'flex'
+          }
+        },
+          // Top Bar Header
+          React.createElement('div', { className: 'w-full max-w-6xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-sky-500/20 pb-3' },
+            React.createElement('div', null,
+              React.createElement('div', {
+                className: 'text-xs font-bold uppercase tracking-widest text-sky-400 flex items-center gap-2 mb-1'
+              },
+                React.createElement('span', { className: 'w-2 h-2 rounded-full bg-sky-400 shadow-[0_0_8px_#38bdf8]' }),
+                'RetAIn Platform'
+              ),
+              React.createElement('h3', {
+                className: 'text-2xl md:text-3xl font-extrabold text-white tracking-tight'
+              }, 'Proactive, Continuous & High-ROI')
+            ),
+            React.createElement('div', { className: 'flex items-center gap-3' },
+              React.createElement('span', {
+                className: 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-sky-400/15 text-sky-300 border border-sky-400/35 shadow-[0_0_15px_rgba(56,189,248,0.3)]'
+              }, '✦ AI Native'),
+              React.createElement('span', {
+                className: 'text-xs font-mono px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+              }, 'Pre-Emption: 90 Days Early')
+            )
+          ),
+
+          // 4 Separately Placed Bento Capability Cards (2x2 Grid)
+          React.createElement('div', {
+            className: 'w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-3.5 flex-1 my-3'
+          },
+            // Bento Card 1: Continuous NLP Mining
+            React.createElement('div', {
+              className: 'bento-card-interactive p-4 md:p-5 rounded-2xl flex flex-col justify-between'
+            },
+              React.createElement('div', null,
+                React.createElement('div', { className: 'flex items-center justify-between mb-2.5' },
+                  React.createElement('span', { className: 'text-[11px] font-mono uppercase tracking-wider text-sky-400 font-bold' }, '01 • Qualitative Mining'),
+                  React.createElement('div', { className: 'flex items-end gap-1 h-3.5' },
+                    [4, 8, 12, 6, 14, 9].map((h, i) =>
+                      React.createElement('span', {
+                        key: i,
+                        className: 'w-1 bg-sky-400 rounded-full animate-pulse',
+                        style: { height: `${h}px`, animationDelay: `${i * 0.15}s` }
+                      })
+                    )
+                  )
+                ),
+                React.createElement('h4', { className: 'text-lg font-bold text-white mb-1.5' }, 'Continuous NLP Mining'),
+                React.createElement('p', { className: 'text-sm text-slate-300 leading-relaxed' },
+                  'Converts raw qualitative feedback into trend signals'
+                )
+              ),
+              React.createElement('div', { className: 'text-[11px] font-mono text-sky-400/80 pt-2 border-t border-slate-800/80' },
+                'Signal Velocity: Real-time Theme Extraction'
+              )
+            ),
+
+            // Bento Card 2: Privacy-First Cohort Radar
+            React.createElement('div', {
+              className: 'bento-card-interactive p-4 md:p-5 rounded-2xl flex flex-col justify-between'
+            },
+              React.createElement('div', null,
+                React.createElement('div', { className: 'flex items-center justify-between mb-2.5' },
+                  React.createElement('span', { className: 'text-[11px] font-mono uppercase tracking-wider text-sky-400 font-bold' }, '02 • Cohort Risk Engine'),
+                  React.createElement('span', { className: 'text-xs px-2 py-0.5 rounded bg-sky-400/10 text-sky-300 border border-sky-400/20' }, '5+ Staff Guard')
+                ),
+                React.createElement('h4', { className: 'text-lg font-bold text-white mb-1.5' }, 'Privacy-First Cohort Radar'),
+                React.createElement('p', { className: 'text-sm text-slate-300 leading-relaxed' },
+                  'Team-level early flight risk detection'
+                )
+              ),
+              React.createElement('div', { className: 'text-[11px] font-mono text-emerald-400/90 pt-2 border-t border-slate-800/80' },
+                'Protection: Zero Individual PII Tracking'
+              )
+            ),
+
+            // Bento Card 3: Pre-Emptive Micro-Pulses
+            React.createElement('div', {
+              className: 'bento-card-interactive p-4 md:p-5 rounded-2xl flex flex-col justify-between'
+            },
+              React.createElement('div', null,
+                React.createElement('div', { className: 'flex items-center justify-between mb-2.5' },
+                  React.createElement('span', { className: 'text-[11px] font-mono uppercase tracking-wider text-sky-400 font-bold' }, '03 • Pulse Velocity'),
+                  React.createElement('span', { className: 'text-xs text-sky-300 font-bold' }, '< 45 Seconds')
+                ),
+                React.createElement('h4', { className: 'text-lg font-bold text-white mb-1.5' }, 'Pre-Emptive Micro-Pulses'),
+                React.createElement('p', { className: 'text-sm text-slate-300 leading-relaxed' },
+                  'Non leading 2 question checks'
+                )
+              ),
+              React.createElement('div', { className: 'text-[11px] font-mono text-sky-400/80 pt-2 border-t border-slate-800/80' },
+                'Response Rate: 94% Minimal Friction'
+              )
+            ),
+
+            // Bento Card 4: Modeled Action Playbooks
+            React.createElement('div', {
+              className: 'bento-card-interactive p-4 md:p-5 rounded-2xl flex flex-col justify-between'
+            },
+              React.createElement('div', null,
+                React.createElement('div', { className: 'flex items-center justify-between mb-2.5' },
+                  React.createElement('span', { className: 'text-[11px] font-mono uppercase tracking-wider text-sky-400 font-bold' }, '04 • Retention Engine'),
+                  React.createElement('span', { className: 'text-xs text-emerald-400 font-bold' }, 'SHRM Aligned')
+                ),
+                React.createElement('h4', { className: 'text-lg font-bold text-white mb-1.5' }, 'Modeled Action Playbooks'),
+                React.createElement('p', { className: 'text-sm text-slate-300 leading-relaxed' },
+                  'Targeted, policy-aligned interventions mapped to company guidelines.'
+                )
+              ),
+              React.createElement('div', { className: 'text-[11px] font-mono text-sky-400/80 pt-2 border-t border-slate-800/80' },
+                'Outcome: Maximum Long-term Retention ROI'
+              )
+            )
+          )
+        )
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('transition-root')).render(React.createElement(TransitionComponent));
+  </script>
+</body>
+</html>
+"""
+
+os.makedirs("scratch", exist_ok=True)
+with open("scratch/metamorphosis_preview.html", "w", encoding="utf-8") as f:
+    f.write(html_template)
+
+print("Saved preview to scratch/metamorphosis_preview.html")

@@ -265,7 +265,6 @@ framer_hero_html = """
   }
 
   .wa-card:hover {
-    transform: scale(1.09) translateY(-6px) !important;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8), 0 0 22px rgba(56, 189, 248, 0.5) !important;
     z-index: 100 !important;
   }
@@ -677,7 +676,12 @@ framer_hero_html = """
       const maxX = Math.max(minX, window.innerWidth - cardW - 16);
       const safeX = Math.max(minX, Math.min(maxX, posX));
 
-      card.style.transform = `translate3d(${safeX}px, ${posY}px, 0) scale(${s}) rotate(${spreadRot}deg)`;
+      // Smooth hover scale and elevation integrated directly into translation
+      const isHovered = card.matches(':hover');
+      const hoverScale = isHovered ? 1.07 : 1.0;
+      const hoverLift = isHovered ? -6 : 0;
+
+      card.style.transform = `translate3d(${safeX}px, ${posY + hoverLift}px, 0) scale(${s * hoverScale}) rotate(${spreadRot}deg)`;
       card.style.opacity = Math.min(1.0, 0.45 + introProgress * 0.55);
     });
 
